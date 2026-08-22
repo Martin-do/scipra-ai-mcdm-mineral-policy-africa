@@ -5,6 +5,7 @@ import json
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 
 from sklearn.feature_extraction.text import HashingVectorizer
 
@@ -45,6 +46,86 @@ def canonical_priority(candidate_id: str) -> tuple[int, str]:
     return (4, candidate_id)
 
 
+def normalise_title(title: str) -> str:
+    text = title.casefold().replace("’", "'").replace("–", "-").replace("—", "-")
+    text = re.sub(r"[^a-z0-9]+", " ", text)
+    return " ".join(text.split())
+
+
+def canonicalise_url(url: str) -> str:
+    url = (url or "").strip()
+    if not url:
+        return ""
+    try:
+        parts = urlsplit(url)
+        host = (parts.hostname or "").lower()
+        if host.startswith("www."):
+            host = host[4:]
+        path = re.sub(r"/+", "/", parts.path).rstrip("/")
+        # Query parameters on report PDF URLs are commonly cache/version tokens;
+        # they do not create a distinct document identity.
+        return urlunsplit((parts.scheme.lower() or "https", host, path, "", ""))
+    except Exception:
+        return url
+
+
+def metadata_review_clusters(unique_rows: list[dict[str, str]]) -> list[dict[str, object]]:
+    groups: dict[tuple[str, str], list[dict[str, str]]] = defaultdict(list)
+    for row in unique_rows:
+        key = (normalise_title(row.get("title", "")), (row.get("year") or "").strip())
+        if key[0]:
+            groups[key].append(row)
+
+    output: list[dict[str, object]] = []
+    cluster_id = 0
+    for (title_key, year), group in sorted(groups.items()):
+        if len(group) < 2:
+            continue
+        # Exact text duplicates were already removed. Every remaining same-title
+        # cluster is therefore review evidence, not an automatic exclusion.
+        cluster_id += 1
+        for row in group:
+            output.append({
+                "cluster_id": cluster_id,
+                "normalised_title": title_key,
+                "year": year,
+                "candidate_id": row["candidate_id"],
+                "title": row.get("title", ""),
+                "publisher": row.get("publisher", ""),
+                "source_url": row.get("source_url", ""),
+                "text_sha256": row.get("text_sha256", ""),
+                "decision": "manual_review_same_title_year",
+            })
+    return output
+
+
+def url_review_clusters(unique_rows: list[dict[str, str]]) -> list[dict[str, object]]:
+    groups: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for row in unique_rows:
+        key = canonicalise_url(row.get("source_url", ""))
+        if key:
+            groups[key].append(row)
+
+    output: list[dict[str, object]] = []
+    cluster_id = 0
+    for url_key, group in sorted(groups.items()):
+        if len(group) < 2:
+            continue
+        cluster_id += 1
+        for row in group:
+            output.append({
+                "cluster_id": cluster_id,
+                "canonicalised_url": url_key,
+                "candidate_id": row["candidate_id"],
+                "title": row.get("title", ""),
+                "year": row.get("year", ""),
+                "publisher": row.get("publisher", ""),
+                "text_sha256": row.get("text_sha256", ""),
+                "decision": "manual_review_same_url",
+            })
+    return output
+
+
 def main() -> int:
     rows = read_status()
     extracted = [r for r in rows if r.get("status") == "acquired_extracted"]
@@ -83,11 +164,12 @@ def main() -> int:
             })
 
     unique_rows = [r for r in extracted if r["candidate_id"] not in noncanonical_ids]
+    title_review = metadata_review_clusters(unique_rows)
+    url_review = url_review_clusters(unique_rows)
 
     # Near-duplicate review is intentionally conservative. Exact-hash duplicates
-    # are already collapsed above. HashingVectorizer is used only to surface
-    # high-similarity pairs for manual review; it never excludes a document by
-    # itself.
+    # are already collapsed above. Similarity only surfaces pairs for manual
+    # review and never excludes a document by itself.
     texts: list[str] = []
     text_rows: list[dict[str, str]] = []
     for row in unique_rows:
@@ -133,7 +215,7 @@ def main() -> int:
                 "publisher_b": b.get("publisher", ""),
                 "url_a": a.get("source_url", ""),
                 "url_b": b.get("source_url", ""),
-                "decision": "manual_review",
+                "decision": "manual_review_near_duplicate",
             })
 
     exception_fields = [
@@ -156,6 +238,18 @@ def main() -> int:
         duplicate_rows,
     )
     write_csv(
+        QC / "same_title_year_review.csv",
+        ["cluster_id", "normalised_title", "year", "candidate_id", "title", "publisher",
+         "source_url", "text_sha256", "decision"],
+        title_review,
+    )
+    write_csv(
+        QC / "same_url_review.csv",
+        ["cluster_id", "canonicalised_url", "candidate_id", "title", "year", "publisher",
+         "text_sha256", "decision"],
+        url_review,
+    )
+    write_csv(
         QC / "near_duplicate_review.csv",
         ["similarity", "candidate_id_a", "candidate_id_b", "title_a", "title_b", "year_a",
          "year_b", "publisher_a", "publisher_b", "url_a", "url_b", "decision"],
@@ -172,13 +266,15 @@ def main() -> int:
         "exact_duplicate_clusters": duplicate_cluster_count,
         "exact_duplicate_redundant_records": len(noncanonical_ids),
         "preliminary_unique_extracted_texts_after_exact_dedup": len(unique_rows),
+        "same_title_year_clusters_requiring_review": len({r["cluster_id"] for r in title_review}),
+        "same_url_clusters_requiring_review": len({r["cluster_id"] for r in url_review}),
         "near_duplicate_pairs_flagged_at_similarity_ge_0_95": len(near_rows),
         "status_counts": dict(status_counts),
         "near_duplicate_threshold": NEAR_DUPLICATE_THRESHOLD,
         "corpus_frozen": False,
         "note": (
             "Preliminary QC only. Corpus freeze requires resolution of acquisition exceptions, "
-            "manual review of near duplicates, substantive relevance/text-quality screening, "
+            "same-title/URL and near-duplicate reviews, substantive relevance/text-quality screening, "
             "and documented source-family saturation."
         ),
     }
