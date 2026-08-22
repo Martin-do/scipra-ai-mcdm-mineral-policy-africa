@@ -16,6 +16,10 @@ on:
       - 'data/reconstruction/expanded_*_candidates*.csv'
   workflow_dispatch:
 
+concurrency:
+  group: scipra-dataset-acquisition
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
