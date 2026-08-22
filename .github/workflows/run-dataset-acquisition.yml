@@ -6,6 +6,10 @@ on:
       - main
     paths:
       - '.github/workflows/run-dataset-acquisition.yml'
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 permissions:
