@@ -36,7 +36,7 @@ jobs:
           pip install requests beautifulsoup4 pypdf trafilatura
 
       - name: Acquire and extract candidate corpus
-        run: python data/reconstruction/acquire_corpus.py
+        run: python data/reconstruction/acquire_corpus_v2.py
 
       - name: Publish acquisition status to dataset branch
         if: always()
