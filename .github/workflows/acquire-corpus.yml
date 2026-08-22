@@ -9,6 +9,7 @@ on:
       - 'data/reconstruction/acquire_corpus.py'
       - 'data/reconstruction/acquire_corpus_v2.py'
       - 'data/reconstruction/acquire_corpus_v3.py'
+      - 'data/reconstruction/qc_corpus.py'
       - 'data/reconstruction/source_overrides.csv'
       - 'data/reconstruction/candidate_corpus_87.csv'
       - 'data/reconstruction/retrieval_manifest.csv'
@@ -39,18 +40,22 @@ jobs:
           python-version: '3.11'
           cache: pip
 
-      - name: Install acquisition dependencies
+      - name: Install acquisition and QC dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 pypdf trafilatura cryptography
+          pip install requests beautifulsoup4 pypdf trafilatura cryptography scikit-learn==1.4.2
 
       - name: Acquire and extract candidate corpus
         run: python data/reconstruction/acquire_corpus_v3.py
 
-      - name: Show acquisition summary
+      - name: Run preliminary corpus QC
+        run: python data/reconstruction/qc_corpus.py
+
+      - name: Show acquisition and QC summary
         if: always()
         run: |
           cat acquisition_output/summary.json || true
+          cat acquisition_output/qc/summary.json || true
           python - <<'PY'
           import csv
           from collections import Counter
@@ -66,7 +71,7 @@ jobs:
                       print(r['candidate_id'], r['status'], r['http_status'], r['error'], r['source_url'])
           PY
 
-      - name: Publish acquisition status to branch
+      - name: Publish acquisition and QC status to branch
         if: always()
         run: |
           if [ -f acquisition_output/acquisition_status.csv ]; then
@@ -75,11 +80,15 @@ jobs:
           if [ -f acquisition_output/summary.json ]; then
             cp acquisition_output/summary.json data/reconstruction/acquisition_summary_latest.json
           fi
+          if [ -d acquisition_output/qc ]; then
+            mkdir -p data/reconstruction/qc
+            cp acquisition_output/qc/* data/reconstruction/qc/
+          fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/reconstruction/acquisition_status_latest.csv data/reconstruction/acquisition_summary_latest.json || true
+          git add data/reconstruction/acquisition_status_latest.csv data/reconstruction/acquisition_summary_latest.json data/reconstruction/qc || true
           if ! git diff --cached --quiet; then
-            git commit -m 'Record latest corpus acquisition audit'
+            git commit -m 'Record latest corpus acquisition and QC audit'
             git push origin HEAD:dataset-reconstruction
           fi
 
