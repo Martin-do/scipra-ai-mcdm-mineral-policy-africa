@@ -1,0 +1,3 @@
+cluster_id,canonicalised_url,candidate_id,title,year,publisher,text_sha256,decision
+1,https://engineeringnews.co.za/article/sibanye-concludes-five-year-wage-deal-at-rustenburg-marikana-operations-2022-10-28,EXP-MEDIA-066,"Sibanye concludes five-year wage deal at Rustenburg, Marikana operations",2022,Engineering News,f8a2558ab898d06afbd7bbd4487d92a7ad4ffb258e62f9a800600a0af042df62,manual_review_same_url
+1,https://engineeringnews.co.za/article/sibanye-concludes-five-year-wage-deal-at-rustenburg-marikana-operations-2022-10-28,WEB-MEDIA-006,"Sibanye concludes five-year wage deal at Rustenburg, Marikana operations",2022,Engineering News,de5492ecf08337c5b150defff4a1a9ae46042cba877a9a65b01918531c20204e,manual_review_same_url
