@@ -4,13 +4,10 @@ import csv
 import hashlib
 import io
 import json
-import os
 import re
-import shutil
-import sys
 import time
 from pathlib import Path
-from typing import Dict, Iterable, Optional
+from typing import Dict, Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -24,7 +21,7 @@ RAW_OUT = OUT / "raw"
 TEXT_OUT = OUT / "text"
 
 USER_AGENT = (
-    "Mozilla/5.0 (compatible; SCIPRA-Reproducibility-Acquisition/1.0; "
+    "Mozilla/5.0 (compatible; SCIPRA-Reproducibility-Acquisition/1.1; "
     "+https://github.com/Martin-do/scipra-ai-mcdm-mineral-policy-africa)"
 )
 
@@ -47,6 +44,21 @@ def sha256_text(text: str) -> str:
 def read_csv(path: Path) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8-sig", newline="") as f:
         return list(csv.DictReader(f))
+
+
+def expanded_candidate_files() -> list[Path]:
+    """Return protocol-driven expansion files in deterministic name order."""
+    return sorted(RECON.glob("expanded_*_candidates*.csv"))
+
+
+def row_is_eligible(row: dict[str, str]) -> bool:
+    status = (row.get("screening_status") or row.get("status") or "").strip().lower()
+    return status.startswith("eligible") or status in {
+        "verified_candidate",
+        "verified",
+        "include",
+        "included",
+    }
 
 
 def normalise_space(text: str) -> str:
@@ -125,18 +137,63 @@ def build_lookup() -> Dict[str, dict[str, str]]:
             "source": "institutional_replacement_candidates",
         }
 
+    # Expansion files are screened before acquisition. Only rows whose screening
+    # status is explicitly eligible enter the acquisition set; excluded mirrors
+    # and rejected records remain in the retrieval log but are not fetched as
+    # independent corpus members.
+    for path in expanded_candidate_files():
+        for row in read_csv(path):
+            if not row_is_eligible(row):
+                continue
+            cid = (row.get("candidate_id") or row.get("recovery_id") or "").strip()
+            if not cid:
+                continue
+            lookup[cid] = {
+                "candidate_id": cid,
+                "title": row.get("title", ""),
+                "year": row.get("year", ""),
+                "publisher": row.get("publisher", ""),
+                "url": row.get("url", ""),
+                "source": path.name,
+            }
+
     return lookup
 
 
-def candidate_ids() -> list[str]:
-    rows = read_csv(RECON / "candidate_corpus_87.csv")
-    ids = [(r.get("candidate_doc_id") or "").strip() for r in rows]
-    ids = [x for x in ids if x]
-    if len(ids) != 87:
-        raise RuntimeError(f"Expected exactly 87 candidate IDs, found {len(ids)}")
+def candidate_ids() -> tuple[list[str], int]:
+    """Return seed + all screened eligible expansion IDs.
+
+    The historical 87-record list is retained as a seed benchmark only. Final
+    acquisition N is protocol-driven and may exceed 87.
+    """
+    seed_rows = read_csv(RECON / "candidate_corpus_87.csv")
+    seed_ids = [(r.get("candidate_doc_id") or "").strip() for r in seed_rows]
+    seed_ids = [x for x in seed_ids if x]
+    if len(seed_ids) != 87:
+        raise RuntimeError(
+            "Historical seed file candidate_corpus_87.csv should contain 87 IDs; "
+            f"found {len(seed_ids)}"
+        )
+
+    ids = list(seed_ids)
+    for path in expanded_candidate_files():
+        for row in read_csv(path):
+            if not row_is_eligible(row):
+                continue
+            cid = (row.get("candidate_id") or row.get("recovery_id") or "").strip()
+            if cid:
+                ids.append(cid)
+
     if len(set(ids)) != len(ids):
-        raise RuntimeError("candidate_corpus_87.csv contains duplicate candidate IDs")
-    return ids
+        seen: set[str] = set()
+        dupes: list[str] = []
+        for cid in ids:
+            if cid in seen and cid not in dupes:
+                dupes.append(cid)
+            seen.add(cid)
+        raise RuntimeError(f"Duplicate acquisition candidate IDs: {dupes}")
+
+    return ids, len(seed_ids)
 
 
 def fetch(session: requests.Session, url: str, attempts: int = 3) -> tuple[Optional[requests.Response], str]:
@@ -160,8 +217,9 @@ def main() -> int:
     RAW_OUT.mkdir(parents=True, exist_ok=True)
     TEXT_OUT.mkdir(parents=True, exist_ok=True)
 
-    ids = candidate_ids()
+    ids, seed_count = candidate_ids()
     lookup = build_lookup()
+    total = len(ids)
 
     session = requests.Session()
     session.headers.update({"User-Agent": USER_AGENT, "Accept-Language": "en-US,en;q=0.9"})
@@ -175,7 +233,7 @@ def main() -> int:
         publisher = str(meta.get("publisher", "") or "")
         year = str(meta.get("year", "") or "")
 
-        print(f"[{idx:02d}/87] {cid} {publisher} {title[:70]}", flush=True)
+        print(f"[{idx:03d}/{total}] {cid} {publisher} {title[:70]}", flush=True)
 
         raw: bytes | None = None
         content_type = ""
@@ -255,6 +313,7 @@ def main() -> int:
             "title": title,
             "year": year,
             "publisher": publisher,
+            "metadata_source": meta.get("source", ""),
             "source_url": url,
             "final_url": final_url,
             "http_status": http_status,
@@ -281,7 +340,8 @@ def main() -> int:
         counts[str(row["status"])] = counts.get(str(row["status"]), 0) + 1
 
     summary = {
-        "expected_candidates": 87,
+        "historical_seed_benchmark": seed_count,
+        "eligible_expansion_candidates": total - seed_count,
         "processed_candidates": len(status_rows),
         "status_counts": counts,
         "total_raw_bytes": sum(int(r["raw_bytes"]) for r in status_rows),
