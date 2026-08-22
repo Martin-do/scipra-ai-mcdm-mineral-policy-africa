@@ -12,6 +12,7 @@ on:
       - 'data/reconstruction/candidate_corpus_87.csv'
       - 'data/reconstruction/retrieval_manifest.csv'
       - 'data/reconstruction/institutional_replacement_candidates.csv'
+      - 'data/reconstruction/expanded_*_candidates*.csv'
   workflow_dispatch:
 
 permissions:
@@ -36,7 +37,7 @@ jobs:
       - name: Install acquisition dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 pypdf trafilatura
+          pip install requests beautifulsoup4 pypdf trafilatura cryptography
 
       - name: Acquire and extract candidate corpus
         run: python data/reconstruction/acquire_corpus_v2.py
