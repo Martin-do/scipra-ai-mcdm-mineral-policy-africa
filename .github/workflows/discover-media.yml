@@ -1,0 +1,51 @@
+name: Discover documented media URLs
+
+on:
+  push:
+    branches:
+      - dataset-reconstruction
+    paths:
+      - 'data/reconstruction/discover_media_urls.py'
+      - '.github/workflows/discover-media.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: scipra-media-discovery
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout dataset branch
+        uses: actions/checkout@v4
+        with:
+          ref: dataset-reconstruction
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Discover publisher URLs
+        run: python data/reconstruction/discover_media_urls.py
+      - name: Publish discovery audit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/reconstruction/discovery
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record publisher media discovery audit'
+            git pull --rebase origin dataset-reconstruction
+            git push origin HEAD:dataset-reconstruction
+          fi
+      - name: Upload discovery artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: scipra-media-discovery
+          path: data/reconstruction/discovery/
+          retention-days: 30
