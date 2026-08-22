@@ -9,6 +9,7 @@ on:
       - 'data/reconstruction/acquire_corpus.py'
       - 'data/reconstruction/acquire_corpus_v2.py'
       - 'data/reconstruction/acquire_corpus_v3.py'
+      - 'data/reconstruction/acquire_corpus_v4.py'
       - 'data/reconstruction/qc_corpus.py'
       - 'data/reconstruction/source_overrides.csv'
       - 'data/reconstruction/candidate_corpus_87.csv'
@@ -42,11 +43,13 @@ jobs:
 
       - name: Install acquisition and QC dependencies
         run: |
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 pypdf trafilatura cryptography pymupdf scikit-learn==1.4.2
+          pip install requests beautifulsoup4 pypdf trafilatura cryptography pymupdf pytesseract pillow scikit-learn==1.4.2
 
       - name: Acquire and extract candidate corpus
-        run: python data/reconstruction/acquire_corpus_v3.py
+        run: python data/reconstruction/acquire_corpus_v4.py
 
       - name: Run preliminary corpus QC
         run: python data/reconstruction/qc_corpus.py
@@ -56,20 +59,6 @@ jobs:
         run: |
           cat acquisition_output/summary.json || true
           cat acquisition_output/qc/summary.json || true
-          python - <<'PY'
-          import csv
-          from collections import Counter
-          from pathlib import Path
-          p = Path('acquisition_output/acquisition_status.csv')
-          if p.exists():
-              rows = list(csv.DictReader(p.open(encoding='utf-8')))
-              print('Rows:', len(rows))
-              print('Statuses:', Counter(r['status'] for r in rows))
-              print('\nFailures/low-text:')
-              for r in rows:
-                  if r['status'] != 'acquired_extracted':
-                      print(r['candidate_id'], r['status'], r['http_status'], r['error'], r['source_url'])
-          PY
 
       - name: Publish acquisition and QC status to branch
         if: always()
@@ -89,6 +78,7 @@ jobs:
           git add data/reconstruction/acquisition_status_latest.csv data/reconstruction/acquisition_summary_latest.json data/reconstruction/qc || true
           if ! git diff --cached --quiet; then
             git commit -m 'Record latest corpus acquisition and QC audit'
+            git pull --rebase origin dataset-reconstruction
             git push origin HEAD:dataset-reconstruction
           fi
 
