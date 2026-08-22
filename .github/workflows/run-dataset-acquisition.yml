@@ -12,6 +12,10 @@ on:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
 
+concurrency:
+  group: scipra-dataset-acquisition
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
