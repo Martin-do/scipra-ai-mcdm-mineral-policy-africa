@@ -1,0 +1,66 @@
+name: Acquire reconstructed corpus
+
+on:
+  push:
+    branches:
+      - dataset-reconstruction
+    paths:
+      - '.github/workflows/acquire-corpus.yml'
+      - 'data/reconstruction/acquire_corpus.py'
+      - 'data/reconstruction/candidate_corpus_87.csv'
+      - 'data/reconstruction/retrieval_manifest.csv'
+      - 'data/reconstruction/institutional_replacement_candidates.csv'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout dataset branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install acquisition dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 pypdf trafilatura
+
+      - name: Acquire and extract candidate corpus
+        run: python data/reconstruction/acquire_corpus.py
+
+      - name: Show acquisition summary
+        if: always()
+        run: |
+          cat acquisition_output/summary.json || true
+          python - <<'PY'
+          import csv
+          from collections import Counter
+          from pathlib import Path
+          p = Path('acquisition_output/acquisition_status.csv')
+          if p.exists():
+              rows = list(csv.DictReader(p.open(encoding='utf-8')))
+              print('Rows:', len(rows))
+              print('Statuses:', Counter(r['status'] for r in rows))
+              print('\nFailures/low-text:')
+              for r in rows:
+                  if r['status'] != 'acquired_extracted':
+                      print(r['candidate_id'], r['status'], r['http_status'], r['error'], r['source_url'])
+          PY
+
+      - name: Upload acquisition audit artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scipra-corpus-acquisition
+          path: acquisition_output/
+          if-no-files-found: warn
+          retention-days: 30
