@@ -10,16 +10,25 @@ from urllib.parse import urlsplit, urlunsplit
 from sklearn.feature_extraction.text import HashingVectorizer
 
 ROOT = Path(__file__).resolve().parents[2]
+RECON = ROOT / "data" / "reconstruction"
 OUT = ROOT / "acquisition_output"
 QC = OUT / "qc"
 STATUS = OUT / "acquisition_status.csv"
 TEXT_DIR = OUT / "text"
+MANUAL_DECISIONS = RECON / "manual_qc_decisions.csv"
 
 NEAR_DUPLICATE_THRESHOLD = 0.95
 
 
 def read_status() -> list[dict[str, str]]:
     with STATUS.open("r", encoding="utf-8-sig", newline="") as handle:
+        return list(csv.DictReader(handle))
+
+
+def read_manual_decisions() -> list[dict[str, str]]:
+    if not MANUAL_DECISIONS.exists():
+        return []
+    with MANUAL_DECISIONS.open("r", encoding="utf-8-sig", newline="") as handle:
         return list(csv.DictReader(handle))
 
 
@@ -32,9 +41,6 @@ def write_csv(path: Path, fieldnames: list[str], rows: list[dict[str, object]]) 
 
 
 def canonical_priority(candidate_id: str) -> tuple[int, str]:
-    # Prefer a historical seed identifier when identical text occurs in a later
-    # expansion record. This is identity selection only; it does not restore the
-    # historical N=87 design or privilege historical labels/results.
     if re.match(r"^(OFFICIAL|INST|MEDIA|CORP)-", candidate_id):
         return (0, candidate_id)
     if candidate_id.startswith("WEB-"):
@@ -62,8 +68,6 @@ def canonicalise_url(url: str) -> str:
         if host.startswith("www."):
             host = host[4:]
         path = re.sub(r"/+", "/", parts.path).rstrip("/")
-        # Query parameters on report PDF URLs are commonly cache/version tokens;
-        # they do not create a distinct document identity.
         return urlunsplit((parts.scheme.lower() or "https", host, path, "", ""))
     except Exception:
         return url
@@ -81,8 +85,6 @@ def metadata_review_clusters(unique_rows: list[dict[str, str]]) -> list[dict[str
     for (title_key, year), group in sorted(groups.items()):
         if len(group) < 2:
             continue
-        # Exact text duplicates were already removed. Every remaining same-title
-        # cluster is therefore review evidence, not an automatic exclusion.
         cluster_id += 1
         for row in group:
             output.append({
@@ -140,7 +142,6 @@ def main() -> int:
     duplicate_rows: list[dict[str, object]] = []
     noncanonical_ids: set[str] = set()
     duplicate_cluster_count = 0
-
     for text_hash, group in sorted(by_hash.items()):
         if len(group) < 2:
             continue
@@ -164,15 +165,39 @@ def main() -> int:
             })
 
     unique_rows = [r for r in extracted if r["candidate_id"] not in noncanonical_ids]
-    title_review = metadata_review_clusters(unique_rows)
-    url_review = url_review_clusters(unique_rows)
 
-    # Near-duplicate review is intentionally conservative. Exact-hash duplicates
-    # are already collapsed above. Similarity only surfaces pairs for manual
-    # review and never excludes a document by itself.
+    manual_decisions = read_manual_decisions()
+    excluded_manual_ids = {
+        (r.get("candidate_id") or "").strip()
+        for r in manual_decisions
+        if (r.get("decision") or "").strip().lower().startswith("exclude")
+    }
+    decision_by_id = {(r.get("candidate_id") or "").strip(): r for r in manual_decisions}
+    manual_exclusion_rows: list[dict[str, object]] = []
+    for row in unique_rows:
+        cid = row["candidate_id"]
+        if cid not in excluded_manual_ids:
+            continue
+        decision = decision_by_id[cid]
+        manual_exclusion_rows.append({
+            "candidate_id": cid,
+            "title": row.get("title", ""),
+            "year": row.get("year", ""),
+            "publisher": row.get("publisher", ""),
+            "decision": decision.get("decision", ""),
+            "decision_stage": decision.get("decision_stage", ""),
+            "reason": decision.get("reason", ""),
+            "evidence_basis": decision.get("evidence_basis", ""),
+            "model_results_seen": decision.get("model_results_seen", ""),
+        })
+
+    review_rows = [r for r in unique_rows if r["candidate_id"] not in excluded_manual_ids]
+    title_review = metadata_review_clusters(review_rows)
+    url_review = url_review_clusters(review_rows)
+
     texts: list[str] = []
     text_rows: list[dict[str, str]] = []
-    for row in unique_rows:
+    for row in review_rows:
         path = TEXT_DIR / f"{row['candidate_id']}.txt"
         if not path.exists():
             continue
@@ -229,32 +254,24 @@ def main() -> int:
         "candidate_id", "title", "year", "publisher", "metadata_source", "source_url",
         "final_url", "raw_sha256", "text_sha256", "text_words",
     ]
-    manifest_rows = [{key: row.get(key, "") for key in manifest_fields} for row in unique_rows]
+    manifest_rows = [{key: row.get(key, "") for key in manifest_fields} for row in review_rows]
 
-    write_csv(
-        QC / "exact_duplicate_clusters.csv",
-        ["text_sha256", "cluster_size", "canonical_id", "candidate_id", "is_canonical",
-         "title", "year", "publisher", "source_url", "metadata_source"],
-        duplicate_rows,
-    )
-    write_csv(
-        QC / "same_title_year_review.csv",
-        ["cluster_id", "normalised_title", "year", "candidate_id", "title", "publisher",
-         "source_url", "text_sha256", "decision"],
-        title_review,
-    )
-    write_csv(
-        QC / "same_url_review.csv",
-        ["cluster_id", "canonicalised_url", "candidate_id", "title", "year", "publisher",
-         "text_sha256", "decision"],
-        url_review,
-    )
-    write_csv(
-        QC / "near_duplicate_review.csv",
-        ["similarity", "candidate_id_a", "candidate_id_b", "title_a", "title_b", "year_a",
-         "year_b", "publisher_a", "publisher_b", "url_a", "url_b", "decision"],
-        sorted(near_rows, key=lambda r: float(r["similarity"]), reverse=True),
-    )
+    write_csv(QC / "exact_duplicate_clusters.csv",
+              ["text_sha256", "cluster_size", "canonical_id", "candidate_id", "is_canonical",
+               "title", "year", "publisher", "source_url", "metadata_source"], duplicate_rows)
+    write_csv(QC / "manual_exclusions.csv",
+              ["candidate_id", "title", "year", "publisher", "decision", "decision_stage",
+               "reason", "evidence_basis", "model_results_seen"], manual_exclusion_rows)
+    write_csv(QC / "same_title_year_review.csv",
+              ["cluster_id", "normalised_title", "year", "candidate_id", "title", "publisher",
+               "source_url", "text_sha256", "decision"], title_review)
+    write_csv(QC / "same_url_review.csv",
+              ["cluster_id", "canonicalised_url", "candidate_id", "title", "year", "publisher",
+               "text_sha256", "decision"], url_review)
+    write_csv(QC / "near_duplicate_review.csv",
+              ["similarity", "candidate_id_a", "candidate_id_b", "title_a", "title_b", "year_a",
+               "year_b", "publisher_a", "publisher_b", "url_a", "url_b", "decision"],
+              sorted(near_rows, key=lambda r: float(r["similarity"]), reverse=True))
     write_csv(QC / "acquisition_exceptions.csv", exception_fields, exception_rows)
     write_csv(QC / "preliminary_unique_text_manifest.csv", manifest_fields, manifest_rows)
 
@@ -265,7 +282,9 @@ def main() -> int:
         "acquisition_exception_records": len(exceptions),
         "exact_duplicate_clusters": duplicate_cluster_count,
         "exact_duplicate_redundant_records": len(noncanonical_ids),
-        "preliminary_unique_extracted_texts_after_exact_dedup": len(unique_rows),
+        "unique_extracted_texts_after_exact_dedup_before_manual_exclusions": len(unique_rows),
+        "prospective_manual_exclusions_applied": len(manual_exclusion_rows),
+        "preliminary_corpus_records_after_exact_dedup_and_prospective_exclusions": len(review_rows),
         "same_title_year_clusters_requiring_review": len({r["cluster_id"] for r in title_review}),
         "same_url_clusters_requiring_review": len({r["cluster_id"] for r in url_review}),
         "near_duplicate_pairs_flagged_at_similarity_ge_0_95": len(near_rows),
