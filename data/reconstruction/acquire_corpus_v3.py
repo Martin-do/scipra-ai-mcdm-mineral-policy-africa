@@ -152,9 +152,27 @@ def build_lookup_v3() -> dict[str, dict[str, str]]:
     return lookup
 
 
+def bounded_fetch(session, url: str, attempts: int = 2):
+    """Bound failure latency while preserving failed URLs for later recovery."""
+    last = ""
+    for attempt in range(1, attempts + 1):
+        try:
+            response = session.get(url, timeout=30, allow_redirects=True)
+            if response.status_code == 200:
+                return response, ""
+            last = f"HTTP {response.status_code}"
+            if response.status_code in {401, 403, 404, 410}:
+                return response, last
+        except Exception as exc:
+            last = f"{type(exc).__name__}: {exc}"
+        base.time.sleep(attempt * 2)
+    return None, last
+
+
 base.row_is_eligible = eligible
 base.candidate_ids = candidate_ids_v3
 base.build_lookup = build_lookup_v3
+base.fetch = bounded_fetch
 
 if __name__ == "__main__":
     raise SystemExit(base.main())
