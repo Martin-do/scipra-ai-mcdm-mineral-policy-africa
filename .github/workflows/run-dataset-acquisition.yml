@@ -1,18 +1,43 @@
-name: Run reconstructed corpus acquisition
+name: Observe reconstructed media discovery
 
-# Temporary manual trigger retained only as a fallback. The authoritative
-# acquisition workflow now lives on dataset-reconstruction and is triggered by
-# changes to the reconstruction inputs. Keeping this workflow off PR synchronize
-# prevents it from cancelling the branch-native run through the shared
-# concurrency group.
 on:
+  pull_request:
+    branches:
+      - main
+    types: [synchronize]
   workflow_dispatch:
 
+concurrency:
+  group: scipra-media-discovery-observable
+  cancel-in-progress: true
+
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  note:
+  discover:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - run: echo "Use .github/workflows/acquire-corpus.yml on dataset-reconstruction for acquisition/QC."
+      - name: Checkout dataset reconstruction branch
+        uses: actions/checkout@v4
+        with:
+          ref: dataset-reconstruction
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Discover documented publisher URLs
+        run: python data/reconstruction/discover_media_urls.py
+      - name: Publish discovery audit to dataset branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/reconstruction/discovery
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record publisher media discovery audit'
+            git pull --rebase origin dataset-reconstruction
+            git push origin HEAD:dataset-reconstruction
+          fi
