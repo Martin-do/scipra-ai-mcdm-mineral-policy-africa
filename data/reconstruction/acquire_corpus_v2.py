@@ -1,8 +1,9 @@
 """Second-pass acquisition using transparent source overrides.
 
 This wrapper leaves the first-pass acquisition tool unchanged for auditability.
-It removes the malformed local Farlam fallback and applies the pre-label source
-replacement decisions recorded in source_overrides.csv.
+It removes the malformed local Farlam fallback, applies the pre-label source
+replacement decisions recorded in source_overrides.csv, and treats explicit
+`include_candidate` screening decisions as eligible for acquisition.
 """
 from __future__ import annotations
 
@@ -19,6 +20,15 @@ OVERRIDES = RECON / "source_overrides.csv"
 base.LOCAL_FALLBACKS.pop("INST-001", None)
 
 _original_build_lookup = base.build_lookup
+_original_row_is_eligible = base.row_is_eligible
+
+
+def row_is_eligible_with_decision(row: dict[str, str]) -> bool:
+    """Accept prospective include decisions in addition to legacy status labels."""
+    decision = (row.get("decision") or "").strip().lower()
+    if decision in {"include", "included", "include_candidate", "eligible"}:
+        return True
+    return _original_row_is_eligible(row)
 
 
 def build_lookup_with_overrides():
@@ -37,6 +47,7 @@ def build_lookup_with_overrides():
     return lookup
 
 
+base.row_is_eligible = row_is_eligible_with_decision
 base.build_lookup = build_lookup_with_overrides
 
 if __name__ == "__main__":
