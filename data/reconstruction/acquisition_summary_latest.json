@@ -2,9 +2,9 @@
   "expected_candidates": 87,
   "processed_candidates": 87,
   "status_counts": {
-    "acquired_extracted": 77,
-    "acquired_no_text": 10
+    "acquired_extracted": 85,
+    "acquired_no_text": 2
   },
-  "total_raw_bytes": 66024359,
-  "total_text_words": 1013982
+  "total_raw_bytes": 85612242,
+  "total_text_words": 1583510
 }
