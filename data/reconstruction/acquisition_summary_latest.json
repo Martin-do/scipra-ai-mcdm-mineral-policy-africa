@@ -1,0 +1,10 @@
+{
+  "expected_candidates": 87,
+  "processed_candidates": 87,
+  "status_counts": {
+    "acquired_extracted": 77,
+    "acquired_no_text": 10
+  },
+  "total_raw_bytes": 66018549,
+  "total_text_words": 1013982
+}
