@@ -8,6 +8,7 @@ on:
       - '.github/workflows/acquire-corpus.yml'
       - 'data/reconstruction/acquire_corpus.py'
       - 'data/reconstruction/acquire_corpus_v2.py'
+      - 'data/reconstruction/acquire_corpus_v3.py'
       - 'data/reconstruction/source_overrides.csv'
       - 'data/reconstruction/candidate_corpus_87.csv'
       - 'data/reconstruction/retrieval_manifest.csv'
@@ -40,7 +41,7 @@ jobs:
           pip install requests beautifulsoup4 pypdf trafilatura cryptography
 
       - name: Acquire and extract candidate corpus
-        run: python data/reconstruction/acquire_corpus_v2.py
+        run: python data/reconstruction/acquire_corpus_v3.py
 
       - name: Show acquisition summary
         if: always()
