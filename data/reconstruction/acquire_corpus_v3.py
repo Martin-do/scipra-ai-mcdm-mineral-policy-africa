@@ -10,8 +10,12 @@ pre-model corpus-QC stage using URLs and extracted-text hashes.
 from __future__ import annotations
 
 import csv
+import re
 from collections import Counter
 from pathlib import Path
+from urllib.parse import urlsplit
+
+import fitz  # PyMuPDF fallback for PDFs whose text layer pypdf cannot read
 
 import acquire_corpus as base
 
@@ -82,7 +86,6 @@ def candidate_ids_v3() -> tuple[list[str], int]:
 def build_lookup_v3() -> dict[str, dict[str, str]]:
     lookup: dict[str, dict[str, str]] = {}
 
-    # Historical/retrieval seed metadata.
     for row in base.read_csv(RECON / "retrieval_manifest.csv"):
         cid = (row.get("recovery_id") or "").strip()
         if cid:
@@ -109,7 +112,6 @@ def build_lookup_v3() -> dict[str, dict[str, str]]:
                 "source": "institutional_replacement_candidates",
             }
 
-    # Every prospectively screened expansion record, collision-safe.
     for path, row, raw_id in _EXPANSIONS:
         cid = acquisition_id(path, raw_id)
         lookup[cid] = {
@@ -122,8 +124,8 @@ def build_lookup_v3() -> dict[str, dict[str, str]]:
             "source": path.name,
         }
 
-    # Transparent URL/source overrides. For collided expansion IDs, title is used
-    # to identify the intended record so an override cannot leak to another file.
+    # Transparent URL/source overrides. Qualified acquisition IDs may be used
+    # directly when the same raw ID appears in more than one screening file.
     if OVERRIDES.exists():
         with OVERRIDES.open("r", encoding="utf-8-sig", newline="") as handle:
             for row in csv.DictReader(handle):
@@ -138,7 +140,6 @@ def build_lookup_v3() -> dict[str, dict[str, str]]:
                     and meta.get("raw_candidate_id") == raw_id
                     and (not title or meta.get("title") == title)
                 )
-                # Apply only when the target is unambiguous by ID/title.
                 if len(targets) == 1:
                     key = targets[0]
                     lookup[key].update({
@@ -153,8 +154,41 @@ def build_lookup_v3() -> dict[str, dict[str, str]]:
 
 
 def bounded_fetch(session, url: str, attempts: int = 2):
-    """Bound failure latency while preserving failed URLs for later recovery."""
+    """Bound failure latency and handle Sibanye report-site hot-link controls."""
     last = ""
+    parsed = urlsplit(url)
+    is_sibanye_report_asset = (
+        parsed.hostname == "reports.sibanyestillwater.com"
+        and ("/download/" in parsed.path or "/downloads/" in parsed.path)
+    )
+
+    if is_sibanye_report_asset:
+        match = re.search(r"/(20\d{2})/", parsed.path)
+        if match:
+            parent = f"https://reports.sibanyestillwater.com/{match.group(1)}/"
+            try:
+                session.get(parent, timeout=30, allow_redirects=True)
+                response = session.get(
+                    url,
+                    timeout=30,
+                    allow_redirects=True,
+                    headers={
+                        "Referer": parent,
+                        "Accept": "application/pdf,application/octet-stream;q=0.9,*/*;q=0.5",
+                    },
+                )
+                ctype = response.headers.get("Content-Type", "").lower()
+                # The host sometimes returns a ~212 byte HTML hot-link stub with
+                # HTTP 200. Only accept a response that looks like the real asset.
+                if response.status_code == 200 and (
+                    response.content[:4] == b"%PDF" or
+                    ("application/pdf" in ctype and len(response.content) > 1024)
+                ):
+                    return response, ""
+                last = f"sibanye_hotlink_stub_or_http_{response.status_code}"
+            except Exception as exc:
+                last = f"sibanye_warmup_{type(exc).__name__}: {exc}"
+
     for attempt in range(1, attempts + 1):
         try:
             response = session.get(url, timeout=30, allow_redirects=True)
@@ -169,10 +203,29 @@ def bounded_fetch(session, url: str, attempts: int = 2):
     return None, last
 
 
+_pypdf_extract = base.extract_pdf
+
+
+def extract_pdf_with_fallback(data: bytes):
+    """Use PyMuPDF only when pypdf yields no useful text; no OCR is performed."""
+    text, pages, method = _pypdf_extract(data)
+    if len(text.strip()) >= 500:
+        return text, pages, method
+    try:
+        doc = fitz.open(stream=data, filetype="pdf")
+        alt = base.normalise_space("\n\n".join(page.get_text("text") or "" for page in doc))
+        if len(alt.strip()) > len(text.strip()):
+            return alt, len(doc), "pymupdf_fallback"
+    except Exception:
+        pass
+    return text, pages, method
+
+
 base.row_is_eligible = eligible
 base.candidate_ids = candidate_ids_v3
 base.build_lookup = build_lookup_v3
 base.fetch = bounded_fetch
+base.extract_pdf = extract_pdf_with_fallback
 
 if __name__ == "__main__":
     raise SystemExit(base.main())
