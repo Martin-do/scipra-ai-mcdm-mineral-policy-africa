@@ -1,10 +1,13 @@
 {
-  "expected_candidates": 87,
-  "processed_candidates": 87,
+  "historical_seed_benchmark": 87,
+  "eligible_expansion_candidates": 210,
+  "processed_candidates": 297,
   "status_counts": {
-    "acquired_extracted": 85,
-    "acquired_no_text": 2
+    "acquired_extracted": 284,
+    "failed": 5,
+    "acquired_low_text": 2,
+    "acquired_no_text": 6
   },
-  "total_raw_bytes": 85625269,
-  "total_text_words": 1583510
+  "total_raw_bytes": 188749332,
+  "total_text_words": 2678463
 }
