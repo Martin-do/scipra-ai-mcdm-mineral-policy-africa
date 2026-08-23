@@ -3,10 +3,11 @@
   "eligible_expansion_candidates": 279,
   "processed_candidates": 366,
   "status_counts": {
-    "acquired_extracted": 359,
+    "acquired_extracted": 355,
     "acquired_no_text": 5,
-    "acquired_low_text": 2
+    "acquired_low_text": 2,
+    "failed": 4
   },
-  "total_raw_bytes": 224129729,
-  "total_text_words": 3362990
+  "total_raw_bytes": 223896496,
+  "total_text_words": 3358377
 }
