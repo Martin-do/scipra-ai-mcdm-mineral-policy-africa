@@ -12,6 +12,8 @@ on:
       - 'data/reconstruction/acquire_corpus_v4.py'
       - 'data/reconstruction/qc_corpus.py'
       - 'data/reconstruction/triage_media_substantive_screen.py'
+      - 'data/reconstruction/derive_media_screening_evidence.py'
+      - 'data/reconstruction/MEDIA_SUBSTANTIVE_SCREENING_RUBRIC.md'
       - 'data/reconstruction/source_overrides.csv'
       - 'data/reconstruction/candidate_corpus_87.csv'
       - 'data/reconstruction/retrieval_manifest.csv'
@@ -55,17 +57,21 @@ jobs:
       - name: Triage archive media for substantive review
         run: python data/reconstruction/triage_media_substantive_screen.py
 
+      - name: Derive acquired-text screening evidence
+        run: python data/reconstruction/derive_media_screening_evidence.py
+
       - name: Run preliminary corpus QC
         run: python data/reconstruction/qc_corpus.py
 
-      - name: Show acquisition, triage and QC summary
+      - name: Show acquisition, triage, screening evidence and QC summary
         if: always()
         run: |
           cat acquisition_output/summary.json || true
           cat data/reconstruction/media_substantive_screen_triage_summary.json || true
+          cat data/reconstruction/media_screening_evidence_summary.json || true
           cat acquisition_output/qc/summary.json || true
 
-      - name: Publish acquisition, triage and QC status to branch
+      - name: Publish acquisition, triage, screening evidence and QC status to branch
         if: always()
         run: |
           if [ -f acquisition_output/acquisition_status.csv ]; then
@@ -80,9 +86,9 @@ jobs:
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/reconstruction/acquisition_status_latest.csv data/reconstruction/acquisition_summary_latest.json data/reconstruction/qc data/reconstruction/media_substantive_screen_triage.csv data/reconstruction/media_substantive_screen_triage_summary.json || true
+          git add data/reconstruction/acquisition_status_latest.csv data/reconstruction/acquisition_summary_latest.json data/reconstruction/qc data/reconstruction/media_substantive_screen_triage.csv data/reconstruction/media_substantive_screen_triage_summary.json data/reconstruction/media_screening_evidence.csv data/reconstruction/media_screening_evidence_summary.json || true
           if ! git diff --cached --quiet; then
-            git commit -m 'Record latest corpus acquisition, triage and QC audit'
+            git commit -m 'Record latest corpus acquisition, screening evidence and QC audit'
             git pull --rebase origin dataset-reconstruction
             git push origin HEAD:dataset-reconstruction
           fi
