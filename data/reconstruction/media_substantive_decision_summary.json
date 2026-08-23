@@ -1,23 +1,25 @@
 {
   "ledger_scope": "154_lonmin_only_low_case_signal_records",
   "records_in_ledger": 154,
-  "final_decisions_made": 26,
-  "final_inclusions": 1,
-  "final_exclusions": 25,
-  "pending_substantive_review": 128,
+  "final_decisions_made": 77,
+  "final_inclusions": 18,
+  "final_exclusions": 59,
+  "pending_substantive_review": 77,
   "decision_status_counts": {
     "final_batch_01": 26,
-    "pending_substantive_review": 128
+    "final_batch_02": 51,
+    "pending_substantive_review": 77
   },
   "reason_code_counts": {
-    "include_case_central": 1,
-    "review_ambiguous": 128,
-    "exclude_general_corporate_financial": 25
+    "include_case_central": 18,
+    "exclude_general_corporate_financial": 52,
+    "exclude_other_mine_or_event": 7,
+    "review_ambiguous": 77
   },
-  "decision_rule": {
-    "strong_early_2012_event_context": "include_case_central",
-    "strong_routine_corporate_signal": "exclude_general_corporate_financial",
-    "all_other_evidence_classes": "review_ambiguous_pending"
+  "batch_02_explicit_review_counts": {
+    "include_case_central": 17,
+    "exclude_general_corporate_financial": 27,
+    "exclude_other_mine_or_event": 8
   },
-  "important_note": "Batch 01 is a deliberately high-confidence reviewed batch. Likely-routine-corporate, possible-case-context and ambiguous rows remain pending rather than being forced. No stance label, class target or model output was used."
+  "important_note": "Batch 02 uses explicit reviewed candidate-ID lists. Ambiguous ownership-transition, merger/job/community, and extraction-stub records remain pending. No stance label, historical class target or model result was used."
 }
