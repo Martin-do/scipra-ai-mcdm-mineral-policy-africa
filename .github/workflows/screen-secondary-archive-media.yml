@@ -1,4 +1,5 @@
-# Explicit trigger after locking the secondary body-text screening boundary.
+# Temporarily expose the long secondary screening run on PR synchronization so
+# its job state can be inspected through the connected GitHub tooling.
 name: Screen secondary archive media
 
 on:
@@ -9,6 +10,12 @@ on:
       - '.github/workflows/screen-secondary-archive-media.yml'
       - 'data/reconstruction/screen_secondary_archive_media.py'
       - 'data/reconstruction/discovery/media_discovery_prescreen.csv'
+  pull_request:
+    branches:
+      - main
+    types:
+      - synchronize
+      - reopened
   workflow_dispatch:
 
 concurrency:
