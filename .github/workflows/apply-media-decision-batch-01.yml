@@ -1,3 +1,4 @@
+# Explicitly triggered after row-level spot-check of the high-confidence evidence classes.
 name: Apply media decision batch 01
 
 on:
