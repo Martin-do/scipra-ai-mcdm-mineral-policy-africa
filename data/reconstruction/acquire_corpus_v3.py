@@ -6,10 +6,16 @@ different documents. This wrapper preserves every screened candidate by
 qualifying colliding expansion IDs with the source-file stem. It does not
 silently discard either record; duplicate-content resolution is deferred to the
 pre-model corpus-QC stage using URLs and extracted-text hashes.
+
+For external-review snapshots only, set SCIPRA_EXCLUDE_DISCOVERY_DIRECT=1 to
+exclude the automatically pre-screened archive-discovery queue from acquisition.
+That queue remains preserved separately for reviewer screening and is not treated
+as fully screened corpus membership.
 """
 from __future__ import annotations
 
 import csv
+import os
 import re
 from collections import Counter
 from pathlib import Path
@@ -21,6 +27,7 @@ import acquire_corpus as base
 
 RECON = Path(__file__).resolve().parent
 OVERRIDES = RECON / "source_overrides.csv"
+DISCOVERY_DIRECT_FILE = "expanded_media_candidates_discovery_direct.csv"
 
 # Force the verified public Farlam mirror instead of the malformed repository PDF.
 base.LOCAL_FALLBACKS.pop("INST-001", None)
@@ -43,7 +50,10 @@ def eligible(row: dict[str, str]) -> bool:
 
 def expansion_records() -> list[tuple[Path, dict[str, str], str]]:
     records: list[tuple[Path, dict[str, str], str]] = []
+    exclude_discovery_direct = os.getenv("SCIPRA_EXCLUDE_DISCOVERY_DIRECT") == "1"
     for path in base.expanded_candidate_files():
+        if exclude_discovery_direct and path.name == DISCOVERY_DIRECT_FILE:
+            continue
         for row in base.read_csv(path):
             if not eligible(row):
                 continue
