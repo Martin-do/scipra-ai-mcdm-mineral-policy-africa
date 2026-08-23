@@ -2,15 +2,17 @@
 
 The historical 87-record seed uses stable IDs. Expansion screening files were
 created in several passes and some reuse local IDs such as EXP-MEDIA-001 for
-different documents. This wrapper preserves every screened candidate by
+different documents. This wrapper preserves every acquisition candidate by
 qualifying colliding expansion IDs with the source-file stem. It does not
 silently discard either record; duplicate-content resolution is deferred to the
 pre-model corpus-QC stage using URLs and extracted-text hashes.
 
-For external-review snapshots only, set SCIPRA_EXCLUDE_DISCOVERY_DIRECT=1 to
-exclude the automatically pre-screened archive-discovery queue from acquisition.
-That queue remains preserved separately for reviewer screening and is not treated
-as fully screened corpus membership.
+Archive-discovery records may be acquired while still awaiting substantive
+screening. Acquisition is therefore not equivalent to corpus eligibility. For
+external-review snapshots only, set SCIPRA_EXCLUDE_DISCOVERY_DIRECT=1 to exclude
+the automatically pre-screened archive-discovery queue from acquisition. That
+queue remains preserved separately and is never treated as fully screened corpus
+membership merely because its text was retrieved.
 """
 from __future__ import annotations
 
@@ -34,11 +36,19 @@ base.LOCAL_FALLBACKS.pop("INST-001", None)
 
 
 def eligible(row: dict[str, str]) -> bool:
+    """Return whether a row should be acquired, not whether it is in the corpus.
+
+    `candidate_pending_substantive_screen` is intentionally acquisition-eligible
+    because full text is needed to make the substantive decision. The status
+    itself remains non-eligibility language so acquisition cannot be mistaken for
+    an inclusion decision.
+    """
     decision = (row.get("decision") or "").strip().lower()
     if decision in {"include", "included", "include_candidate", "eligible"}:
         return True
     status = (row.get("screening_status") or row.get("status") or "").strip().lower()
     return status.startswith("eligible") or status in {
+        "candidate_pending_substantive_screen",
         "verified_candidate",
         "verified",
         "include",
