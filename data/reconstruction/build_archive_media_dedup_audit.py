@@ -5,6 +5,10 @@ final `include` decision enter this audit. Exact SHA-256 text duplicates are
 collapsed deterministically; same-URL and same-normalised-title/year clusters are
 review flags only and are never automatically collapsed unless hashes are equal.
 
+Substantively eligible records without usable extracted text/hash remain explicit
+analyzability exceptions. They are never assigned a synthetic hash or silently
+dropped.
+
 This script does not freeze the corpus and does not use stance labels or model
 outputs.
 """
@@ -13,7 +17,7 @@ from __future__ import annotations
 import csv
 import json
 import re
-from collections import Counter, defaultdict
+from collections import defaultdict
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
@@ -22,11 +26,13 @@ RECON = ROOT / "data" / "reconstruction"
 TITLE_LEDGER = RECON / "media_substantive_decision_ledger.csv"
 SECONDARY_LEDGER = RECON / "secondary_media_substantive_decision_ledger.csv"
 PRE = RECON / "archive_media_included_pre_dedup_manifest.csv"
+HASH_EXCEPTIONS = RECON / "archive_media_text_hash_exceptions.csv"
 EXACT = RECON / "archive_media_exact_duplicate_clusters.csv"
 TITLE_REVIEW = RECON / "archive_media_same_title_year_review.csv"
 URL_REVIEW = RECON / "archive_media_same_url_review.csv"
 DEDUP = RECON / "archive_media_exact_dedup_preliminary_manifest.csv"
 SUMMARY = RECON / "archive_media_dedup_summary.json"
+SHA_RX = re.compile(r"[0-9a-f]{64}")
 
 
 def read_rows(path: Path):
@@ -45,10 +51,11 @@ def norm_title(title: str) -> str:
     return re.sub(r"[^a-z0-9]+", " ", (title or "").lower()).strip()
 
 
+def valid_sha(value: str) -> bool:
+    return bool(SHA_RX.fullmatch((value or "").strip().lower()))
+
+
 def sort_key(r):
-    # Deterministic representative rule: earliest known publication date, then
-    # lexical URL and record ID. This chooses a canonical row without implying
-    # that later exact copies are invalid sources.
     date = r.get("publication_date_from_url") or f"{r.get('year','9999')}-99-99"
     return (date, r.get("canonical_url", ""), r.get("record_id", ""))
 
@@ -64,8 +71,7 @@ for source, rows in (("title_trigger", title_rows), ("secondary_keyword", second
         if r.get("final_decision") != "include":
             continue
         sha = (r.get("retrieved_text_sha256") or "").strip().lower()
-        if not re.fullmatch(r"[0-9a-f]{64}", sha):
-            raise RuntimeError(f"Included record lacks valid text SHA-256: {r.get('candidate_id')}: {sha!r}")
+        words = (r.get("retrieved_text_words") or "").strip()
         included.append({
             "record_id": r.get("candidate_id", ""),
             "archive_queue": source,
@@ -76,8 +82,9 @@ for source, rows in (("title_trigger", title_rows), ("secondary_keyword", second
             "publisher": r.get("publisher", ""),
             "url": r.get("url", ""),
             "canonical_url": canon_url(r.get("url", "")),
-            "retrieved_text_words": r.get("retrieved_text_words", ""),
-            "retrieved_text_sha256": sha,
+            "retrieved_text_words": words,
+            "retrieved_text_sha256": sha if valid_sha(sha) else "",
+            "text_hash_status": "valid_sha256" if valid_sha(sha) else "missing_or_invalid_sha256",
             "reason_code": r.get("reason_code", ""),
             "decision_status": r.get("decision_status", ""),
             "decision_provenance": r.get("decision_provenance", ""),
@@ -97,6 +104,16 @@ fields = list(included[0].keys())
 with PRE.open("w", encoding="utf-8", newline="") as f:
     w = csv.DictWriter(f, fieldnames=fields); w.writeheader(); w.writerows(included)
 
+hash_exceptions = [r for r in included if r["text_hash_status"] != "valid_sha256"]
+exception_fields = [
+    "record_id", "archive_queue", "title", "year", "publication_date_from_url", "publisher", "url",
+    "retrieved_text_words", "retrieved_text_sha256", "text_hash_status", "reason_code", "decision_provenance"
+]
+with HASH_EXCEPTIONS.open("w", encoding="utf-8", newline="") as f:
+    w = csv.DictWriter(f, fieldnames=exception_fields); w.writeheader()
+    for r in hash_exceptions:
+        w.writerow({k: r.get(k, "") for k in exception_fields})
+
 
 def groups_by(keyfn):
     d = defaultdict(list)
@@ -106,9 +123,10 @@ def groups_by(keyfn):
             d[key].append(r)
     return {k: sorted(v, key=sort_key) for k, v in d.items() if len(v) > 1}
 
-exact_groups = groups_by(lambda r: r["retrieved_text_sha256"])
+# Empty hashes never form duplicate groups.
+exact_groups = groups_by(lambda r: r["retrieved_text_sha256"] if valid_sha(r["retrieved_text_sha256"]) else "")
 url_groups = groups_by(lambda r: r["canonical_url"])
-title_year_groups = groups_by(lambda r: (r["normalised_title"], r["year"]))
+title_year_groups = groups_by(lambda r: (r["normalised_title"], r["year"]) if r["normalised_title"] else None)
 
 exact_rows = []
 redundant_ids = set()
@@ -145,7 +163,8 @@ with EXACT.open("w", encoding="utf-8", newline="") as f:
 def write_review(path: Path, groups: dict, prefix: str, key_label: str):
     out = []
     for n, (key, members) in enumerate(sorted(groups.items(), key=lambda kv: str(kv[0])), 1):
-        exact_same = len({m["retrieved_text_sha256"] for m in members}) == 1
+        hashes = [m["retrieved_text_sha256"] for m in members]
+        exact_same = all(valid_sha(h) for h in hashes) and len(set(hashes)) == 1
         for r in members:
             out.append({
                 "cluster_id": f"{prefix}-{n:04d}",
@@ -157,12 +176,13 @@ def write_review(path: Path, groups: dict, prefix: str, key_label: str):
                 "publisher": r["publisher"],
                 "publication_date_from_url": r["publication_date_from_url"],
                 "retrieved_text_sha256": r["retrieved_text_sha256"],
+                "text_hash_status": r["text_hash_status"],
                 "title": r["title"],
                 "url": r["url"],
             })
     review_fields = [
         "cluster_id", key_label, "cluster_size", "all_text_sha256_equal", "record_id", "archive_queue",
-        "publisher", "publication_date_from_url", "retrieved_text_sha256", "title", "url"
+        "publisher", "publication_date_from_url", "retrieved_text_sha256", "text_hash_status", "title", "url"
     ]
     with path.open("w", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=review_fields); w.writeheader(); w.writerows(out)
@@ -176,22 +196,32 @@ for r in included:
     if r["record_id"] in redundant_ids:
         continue
     x = dict(r)
-    x["exact_dedup_status"] = "retained_unique_or_representative"
+    if r["text_hash_status"] == "valid_sha256":
+        x["exact_dedup_status"] = "retained_unique_or_representative"
+        x["analysis_ready_after_exact_dedup"] = "true"
+    else:
+        x["exact_dedup_status"] = "retained_hash_exception_requires_text_recovery"
+        x["analysis_ready_after_exact_dedup"] = "false"
     dedup.append(x)
 with DEDUP.open("w", encoding="utf-8", newline="") as f:
-    out_fields = fields + ["exact_dedup_status"]
+    out_fields = fields + ["exact_dedup_status", "analysis_ready_after_exact_dedup"]
     w = csv.DictWriter(f, fieldnames=out_fields); w.writeheader(); w.writerows(dedup)
 
+valid_hash_records = sum(r["text_hash_status"] == "valid_sha256" for r in included)
+analysis_ready = sum(r["analysis_ready_after_exact_dedup"] == "true" for r in dedup)
 summary = {
     "scope": "eligible_archive_media_after_substantive_screening_before_corpus_freeze",
     "title_trigger_inclusions": expected_title,
     "secondary_keyword_inclusions": expected_secondary,
     "included_media_records_pre_dedup": len(included),
-    "records_with_valid_text_sha256": len(included),
+    "records_with_valid_text_sha256": valid_hash_records,
+    "text_hash_analyzability_exceptions": len(hash_exceptions),
+    "text_hash_exception_record_ids": [r["record_id"] for r in hash_exceptions],
     "exact_duplicate_clusters": len(exact_groups),
     "exact_duplicate_cluster_members": len(exact_rows),
     "exact_duplicate_redundant_records": len(redundant_ids),
-    "records_after_exact_sha256_dedup": len(dedup),
+    "records_after_exact_sha256_dedup_including_hash_exceptions": len(dedup),
+    "analysis_ready_records_after_exact_sha256_dedup": analysis_ready,
     "same_canonical_url_clusters_for_review": len(url_groups),
     "same_normalised_title_year_clusters_for_review": len(title_year_groups),
     "same_url_rows": len(url_rows),
@@ -200,7 +230,7 @@ summary = {
     "dedup_rule": (
         "Only identical acquired-text SHA-256 values are automatically collapsed. The canonical representative is the earliest "
         "known publication date, then lexical canonical URL and record ID. Same URL or same normalised title/year is review-only "
-        "unless text hashes are identical."
+        "unless text hashes are identical. Eligible records lacking usable text/hash remain explicit analyzability exceptions."
     ),
     "important_note": (
         "This audit covers the newly screened archive-media inclusion pool only. Cross-source/cross-phase deduplication against "
