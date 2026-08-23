@@ -6,8 +6,8 @@
     "retrieved_extracted": 154
   },
   "evidence_class_counts": {
-    "strong_early_2012_event_context": 1,
     "likely_routine_corporate_signal": 23,
+    "strong_early_2012_event_context": 1,
     "ambiguous_low_signal": 73,
     "possible_substantive_case_context": 32,
     "strong_routine_corporate_signal": 25
