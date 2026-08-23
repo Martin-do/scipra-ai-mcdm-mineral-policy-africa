@@ -8,12 +8,6 @@ on:
       - '.github/workflows/screen-low-signal-media.yml'
       - 'data/reconstruction/screen_low_signal_media.py'
       - 'data/reconstruction/media_substantive_screen_triage.csv'
-  pull_request:
-    branches:
-      - main
-    types:
-      - synchronize
-      - reopened
   workflow_dispatch:
 
 concurrency:
