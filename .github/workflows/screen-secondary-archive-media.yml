@@ -1,21 +1,9 @@
-# Temporarily expose the long secondary screening run on PR synchronization so
-# its job state can be inspected through the connected GitHub tooling.
+# Secondary archive screening is complete (1,062/1,062 records processed).
+# Keep this workflow available for deliberate reproducibility reruns only; do not
+# re-fetch the entire secondary archive on every branch/PR update.
 name: Screen secondary archive media
 
 on:
-  push:
-    branches:
-      - dataset-reconstruction
-    paths:
-      - '.github/workflows/screen-secondary-archive-media.yml'
-      - 'data/reconstruction/screen_secondary_archive_media.py'
-      - 'data/reconstruction/discovery/media_discovery_prescreen.csv'
-  pull_request:
-    branches:
-      - main
-    types:
-      - synchronize
-      - reopened
   workflow_dispatch:
 
 concurrency:
