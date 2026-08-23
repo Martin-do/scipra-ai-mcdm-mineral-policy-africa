@@ -1,3 +1,4 @@
+# Explicit trigger after locking the secondary body-text screening boundary.
 name: Screen secondary archive media
 
 on:
