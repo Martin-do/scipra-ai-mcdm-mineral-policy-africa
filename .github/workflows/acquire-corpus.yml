@@ -19,6 +19,12 @@ on:
       - 'data/reconstruction/retrieval_manifest.csv'
       - 'data/reconstruction/institutional_replacement_candidates.csv'
       - 'data/reconstruction/expanded_*_candidates*.csv'
+  pull_request:
+    branches:
+      - main
+    types:
+      - synchronize
+      - reopened
   workflow_dispatch:
 
 concurrency:
