@@ -1,30 +1,38 @@
 {
   "ledger_scope": "all_690_archive_title_trigger_media_candidates",
   "records_in_ledger": 690,
-  "final_decisions_made": 583,
-  "final_inclusions": 505,
-  "final_exclusions": 78,
-  "pending_substantive_review": 107,
+  "final_decisions_made": 646,
+  "final_inclusions": 525,
+  "final_exclusions": 121,
+  "pending_substantive_review": 44,
   "decision_status_counts": {
     "final_batch_01": 25,
     "final_batch_03": 480,
-    "pending_substantive_review": 107,
+    "final_batch_05": 63,
+    "pending_substantive_review": 44,
     "final_batch_02": 52,
     "final_batch_04": 26
   },
   "reason_code_counts": {
-    "include_case_central": 502,
-    "review_ambiguous": 107,
-    "exclude_general_corporate_financial": 69,
-    "exclude_analogical_marikana_reference": 1,
-    "exclude_other_mine_or_event": 8,
-    "include_lonmin_ownership_transition_labour_governance": 3
+    "include_case_central": 507,
+    "exclude_other_place_named_marikana": 3,
+    "review_ambiguous": 44,
+    "exclude_general_corporate_financial": 106,
+    "exclude_analogical_marikana_reference": 2,
+    "exclude_other_mine_or_event": 10,
+    "include_lonmin_ownership_transition_labour_governance": 11,
+    "include_lonmin_marikana_labour_governance": 5,
+    "include_lonmin_community_housing_response": 2
   },
-  "batch_04_applied_counts": {
-    "include_case_central": 9,
-    "exclude_analogical_marikana_reference": 1,
-    "include_lonmin_ownership_transition_labour_governance": 3,
-    "exclude_general_corporate_financial": 13
+  "batch_05_applied_counts": {
+    "include_case_central": 5,
+    "exclude_other_place_named_marikana": 3,
+    "include_lonmin_ownership_transition_labour_governance": 8,
+    "exclude_other_mine_or_event": 2,
+    "exclude_general_corporate_financial": 37,
+    "include_lonmin_marikana_labour_governance": 5,
+    "include_lonmin_community_housing_response": 2,
+    "exclude_analogical_marikana_reference": 1
   },
-  "important_note": "Batch 04 is source-specific and explicit-ID based. It resolves direct justice/policing/memory and qualified ownership-transition records plus clear routine/project false positives. Remaining ambiguous records are not forced. No stance labels, class targets or model outputs were used."
+  "important_note": "Batch 05 is explicit-ID based and applies the locked scope consistently to residual labour/community/ownership-transition records, geographic homonyms, analogical references, unrelated later events and routine corporate/procedural material. Remaining records stay pending. No stance labels, class targets or model outputs were used."
 }
