@@ -1,0 +1,46 @@
+{
+  "records_in_review_queue": 1062,
+  "evidence_class_counts": {
+    "strong_case_context_supported": 91,
+    "possible_lonmin_substantive_context": 80,
+    "no_case_anchor": 115,
+    "sibanye_context_without_case_anchor_review": 361,
+    "ambiguous_secondary_review": 261,
+    "strong_routine_no_case_anchor": 104,
+    "lonmin_low_context_review": 14,
+    "case_name_only_routine_project_or_corporate_signal": 10,
+    "strong_lonmin_context_supported": 17,
+    "case_term_low_context_review": 9
+  },
+  "review_priority_counts": {
+    "1": 91,
+    "3": 80,
+    "10": 115,
+    "5": 361,
+    "7": 261,
+    "9": 104,
+    "6": 14,
+    "99": 10,
+    "2": 17,
+    "4": 9
+  },
+  "publisher_counts": {
+    "Daily Maverick": 118,
+    "Engineering News": 944
+  },
+  "priority_order": {
+    "strong_early_2012_event_context": 0,
+    "strong_case_context_supported": 1,
+    "strong_lonmin_context_supported": 2,
+    "possible_lonmin_substantive_context": 3,
+    "case_term_low_context_review": 4,
+    "sibanye_context_without_case_anchor_review": 5,
+    "lonmin_low_context_review": 6,
+    "ambiguous_secondary_review": 7,
+    "acquisition_or_text_exception": 8,
+    "strong_routine_no_case_anchor": 9,
+    "no_case_anchor": 10
+  },
+  "final_decisions_made": 0,
+  "note": "Reviewer queue only. Priority is for review efficiency, not corpus eligibility. No row is included or excluded by this builder."
+}

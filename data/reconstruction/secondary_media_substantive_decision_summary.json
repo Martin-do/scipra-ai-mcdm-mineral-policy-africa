@@ -1,0 +1,32 @@
+{
+  "ledger_scope": "1062_secondary_keyword_archive_media_candidates",
+  "records_in_ledger": 1062,
+  "final_decisions_made": 916,
+  "final_inclusions": 65,
+  "final_exclusions": 851,
+  "pending_substantive_review": 146,
+  "decision_status_counts": {
+    "final_secondary_batch_01": 916,
+    "pending_substantive_review": 146
+  },
+  "reason_code_counts": {
+    "include_case_central": 48,
+    "review_ambiguous": 146,
+    "exclude_no_marikana_lonmin_case_anchor": 841,
+    "exclude_general_corporate_financial": 10,
+    "include_lonmin_marikana_labour_governance": 17
+  },
+  "batch_01_applied_counts": {
+    "include_case_central": 48,
+    "exclude_no_marikana_lonmin_case_anchor": 841,
+    "exclude_general_corporate_financial": 10,
+    "include_lonmin_marikana_labour_governance": 17
+  },
+  "pending_evidence_class_counts": {
+    "strong_case_context_supported": 43,
+    "possible_lonmin_substantive_context": 80,
+    "lonmin_low_context_review": 14,
+    "case_term_low_context_review": 9
+  },
+  "important_note": "Secondary Batch 01 excludes only acquired-text records lacking a Marikana/Lonmin anchor plus isolated routine project/corporate name matches, and includes only strong/guarded case evidence. All remaining Marikana/Lonmin-bearing records stay pending. No stance labels, class targets or model outputs were used."
+}
