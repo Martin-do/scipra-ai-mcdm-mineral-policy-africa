@@ -1,37 +1,30 @@
 {
   "ledger_scope": "all_690_archive_title_trigger_media_candidates",
   "records_in_ledger": 690,
-  "final_decisions_made": 557,
-  "final_inclusions": 493,
-  "final_exclusions": 64,
-  "pending_substantive_review": 133,
+  "final_decisions_made": 583,
+  "final_inclusions": 505,
+  "final_exclusions": 78,
+  "pending_substantive_review": 107,
   "decision_status_counts": {
     "final_batch_01": 25,
     "final_batch_03": 480,
-    "pending_substantive_review": 133,
-    "final_batch_02": 52
+    "pending_substantive_review": 107,
+    "final_batch_02": 52,
+    "final_batch_04": 26
   },
   "reason_code_counts": {
-    "include_case_central": 493,
-    "review_ambiguous": 133,
-    "exclude_general_corporate_financial": 56,
-    "exclude_other_mine_or_event": 8
+    "include_case_central": 502,
+    "review_ambiguous": 107,
+    "exclude_general_corporate_financial": 69,
+    "exclude_analogical_marikana_reference": 1,
+    "exclude_other_mine_or_event": 8,
+    "include_lonmin_ownership_transition_labour_governance": 3
   },
-  "batch_03_applied_counts": {
-    "include_strong_early_2012_event_context": 48,
-    "include_guarded_strong_case_context": 427,
-    "exclude_case_name_only_project_or_corporate": 5
+  "batch_04_applied_counts": {
+    "include_case_central": 9,
+    "exclude_analogical_marikana_reference": 1,
+    "include_lonmin_ownership_transition_labour_governance": 3,
+    "exclude_general_corporate_financial": 13
   },
-  "evidence_class_counts": {
-    "strong_early_2012_event_context": 49,
-    "strong_case_context_supported": 457,
-    "ambiguous_low_signal": 69,
-    "possible_substantive_case_context": 54,
-    "likely_routine_corporate_signal": 19,
-    "acquisition_or_text_exception": 2,
-    "strong_routine_corporate_signal": 26,
-    "case_name_only_routine_project_or_corporate_signal": 5,
-    "case_term_low_context_review": 9
-  },
-  "important_note": "Batch 03 expands the ledger to all 690 title-trigger records and applies only conservative high-confidence decisions. Possible-context, likely-corporate, ambiguous, low-context and acquisition-exception records remain pending. Duplicate resolution still follows substantive eligibility review. No stance labels, class targets or model outputs were used."
+  "important_note": "Batch 04 is source-specific and explicit-ID based. It resolves direct justice/policing/memory and qualified ownership-transition records plus clear routine/project false positives. Remaining ambiguous records are not forced. No stance labels, class targets or model outputs were used."
 }
