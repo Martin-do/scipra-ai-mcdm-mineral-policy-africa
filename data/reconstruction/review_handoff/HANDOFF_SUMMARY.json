@@ -1,0 +1,24 @@
+{
+  "snapshot_type": "screened_reconstruction_review_snapshot",
+  "corpus_frozen": false,
+  "historical_manuscript_benchmark_n": 87,
+  "screened_candidates_processed": 366,
+  "screened_status_counts": {
+    "acquired_extracted": 359,
+    "acquired_no_text": 5,
+    "acquired_low_text": 2
+  },
+  "screened_unique_extracted_texts_after_exact_dedup_before_manual_exclusions": 302,
+  "screened_preliminary_corpus_after_exact_dedup_and_prospective_exclusions": 300,
+  "screened_acquisition_exceptions": 7,
+  "exact_duplicate_clusters": 54,
+  "exact_duplicate_redundant_records": 57,
+  "same_title_year_review_clusters": 6,
+  "same_url_review_clusters": 1,
+  "near_duplicate_pairs_ge_0_95": 6,
+  "archive_discovered_urls": 2076,
+  "archive_direct_case_new_review_queue": 690,
+  "archive_secondary_keyword_review_queue": 1062,
+  "archive_year_unresolved_review_queue": 7,
+  "important_note": "The preliminary screened corpus is not the final corpus. Archive discovery revealed additional candidates that must be substantively screened before corpus freeze. No stance labels or model results were used to determine membership."
+}

@@ -1,0 +1,24 @@
+{
+  "discovered_urls": 2076,
+  "status_counts": {
+    "direct_case_title_pending_acquisition": 690,
+    "already_screened": 106,
+    "secondary_keyword_only_review": 1062,
+    "exclude_outside_period": 211,
+    "review_year_unresolved": 7
+  },
+  "direct_case_new_candidates": 690,
+  "publisher_status_counts": {
+    "Daily Maverick::already_screened": 73,
+    "Daily Maverick::direct_case_title_pending_acquisition": 361,
+    "Daily Maverick::exclude_outside_period": 43,
+    "Daily Maverick::review_year_unresolved": 6,
+    "Daily Maverick::secondary_keyword_only_review": 118,
+    "Engineering News::already_screened": 33,
+    "Engineering News::direct_case_title_pending_acquisition": 329,
+    "Engineering News::exclude_outside_period": 168,
+    "Engineering News::review_year_unresolved": 1,
+    "Engineering News::secondary_keyword_only_review": 944
+  },
+  "note": "Automated pre-screen only; secondary-keyword URLs are preserved for reviewer screening and are not silently excluded."
+}
