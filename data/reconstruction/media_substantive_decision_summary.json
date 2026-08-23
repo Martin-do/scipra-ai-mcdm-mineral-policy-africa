@@ -1,0 +1,23 @@
+{
+  "ledger_scope": "154_lonmin_only_low_case_signal_records",
+  "records_in_ledger": 154,
+  "final_decisions_made": 26,
+  "final_inclusions": 1,
+  "final_exclusions": 25,
+  "pending_substantive_review": 128,
+  "decision_status_counts": {
+    "final_batch_01": 26,
+    "pending_substantive_review": 128
+  },
+  "reason_code_counts": {
+    "include_case_central": 1,
+    "review_ambiguous": 128,
+    "exclude_general_corporate_financial": 25
+  },
+  "decision_rule": {
+    "strong_early_2012_event_context": "include_case_central",
+    "strong_routine_corporate_signal": "exclude_general_corporate_financial",
+    "all_other_evidence_classes": "review_ambiguous_pending"
+  },
+  "important_note": "Batch 01 is a deliberately high-confidence reviewed batch. Likely-routine-corporate, possible-case-context and ambiguous rows remain pending rather than being forced. No stance label, class target or model output was used."
+}
