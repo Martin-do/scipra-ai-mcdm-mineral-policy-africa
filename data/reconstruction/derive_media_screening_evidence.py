@@ -5,6 +5,11 @@ acquired text to generate reproducible case/event, labour/community and routine
 corporate-financial signals so the decision ledger can be reviewed efficiently.
 No stance labels, historical class targets, model scores or downstream outcomes
 are used.
+
+Important boundary: a literal `Marikana` occurrence is not sufficient by itself.
+Marikana is also a place/mine/project name, so event, labour, justice, community
+or governance context is required before a case-term match is treated as strong
+case evidence.
 """
 from __future__ import annotations
 
@@ -48,7 +53,7 @@ SOCIAL_PATTERNS = {
     "housing": re.compile(r"\bhous(?:e|es|ing)\b|\bhostels?\b", re.I),
     "community": re.compile(r"\bcommunit(?:y|ies)\b", re.I),
     "slp": re.compile(r"\bsocial and labour plan\b|\bslps?\b", re.I),
-    "justice_accountability": re.compile(r"\bjustice\b|\baccountab(?:ility|le)\b|\bcompensat(?:e|ed|ion)\b|\bdamages\b", re.I),
+    "justice_accountability": re.compile(r"\bjustice\b|\baccountab(?:ility|le)\b|\bprosecut(?:e|ed|ion|ions)\b|\bcompensat(?:e|ed|ion)\b|\bdamages\b", re.I),
     "commission_inquiry": re.compile(r"\bcommission\b|\binquiry\b", re.I),
 }
 
@@ -59,14 +64,23 @@ CORPORATE_PATTERNS = {
     "funding_debt": re.compile(r"\bfunding\b|\bfinance\b|\bfinancing\b|\brefinanc(?:e|ed|ing)\b|\bdebt\b|\bloan\b|\bbond\b|\bcredit\b", re.I),
     "transaction": re.compile(r"\bacquisition\b|\bacquire[sd]?\b|\bdisposal\b|\bdispose[sd]?\b|\bstake\b|\bsell(?:s|ing)?\b|\bsold\b|\bbuy(?:s|ing)?\b|\bmerger\b|\btakeover\b", re.I),
     "dividend_rights": re.compile(r"\bdividend\b|\brights issue\b|\bcapital raising\b", re.I),
-    "exploration_project": re.compile(r"\bexploration\b|\bproject\b|\btailings\b|\bsmelter\b|\brefinery\b", re.I),
+    "exploration_project": re.compile(r"\bexploration\b|\bproject\b|\btailings\b|\bsmelter\b|\bfurnace\b|\brefinery\b|\bshaft\b", re.I),
     "commodity_market": re.compile(r"\bplatinum price\b|\bmetal prices?\b|\bcommodity\b|\bmarket\b", re.I),
 }
 
 TITLE_CORPORATE_RX = re.compile(
     r"\b(?:funding|financing|refinancing|stake|share price|earnings|results|production|output|"
     r"acquisition|acquires?|disposal|sells?|sold|merger|takeover|dividend|rights issue|"
-    r"tailings|petrozim|wallbridge|canadian junior|platinum price)\b",
+    r"tailings|petrozim|wallbridge|canadian junior|platinum price|furnace|smelter|project|"
+    r"platinum group metals|pgm|guidance|capex)\b",
+    re.I,
+)
+
+TITLE_CASE_PROCESS_RX = re.compile(
+    r"\b(?:massacre|commission|farlam|famil(?:y|ies)|widows?|victims?|police|saps|"
+    r"kill(?:ed|ing|ings)?|shoot(?:ing|ings)?|strike|workers?|miners?|justice|"
+    r"prosecut(?:e|ed|ion|ions)|accountab(?:ility|le)|compensat(?:e|ed|ion)|"
+    r"housing|community|social and labour plan|slp|memorial|anniversary|amcu|num)\b",
     re.I,
 )
 
@@ -131,15 +145,13 @@ for r in triage_rows:
     social_distinct = len(social_names)
     corporate_distinct = len(corporate_names)
     title_corporate = bool(TITLE_CORPORATE_RX.search(title or ""))
+    title_case_process = bool(TITLE_CASE_PROCESS_RX.search(title or ""))
     early_2012 = early_event_window(pub_date)
     lonmin_mentions = int(r.get("lonmin_mentions") or 0)
 
     if (r.get("acquisition_status") or "") != "acquired_extracted":
         evidence_class = "acquisition_exception"
         evidence_note = "Usable extracted text is unavailable; no substantive decision should be made from title alone."
-    elif case_total > 0:
-        evidence_class = "case_term_supported"
-        evidence_note = "Extracted text contains one or more high-specificity Marikana-case terms."
     elif early_2012 and lonmin_mentions >= 3 and event_distinct >= 3 and (
         "strike" in event_names or "worker_miner" in event_names
     ) and (
@@ -149,6 +161,24 @@ for r in triage_rows:
         evidence_note = (
             "Contemporaneous Aug-Oct 2012 Lonmin coverage has multiple independent strike/worker/police/death/wage/union signals; "
             "the absence of the literal word Marikana is not treated as exclusion evidence."
+        )
+    elif case_total > 0 and (event_distinct >= 2 or social_distinct >= 1 or title_case_process):
+        evidence_class = "strong_case_context_supported"
+        evidence_note = (
+            "A Marikana/Farlam/Wonderkop/Nkaneng/Bapo term is supported by event, labour, justice, community or governance context; "
+            "the case term is not being treated as sufficient on its own."
+        )
+    elif case_total > 0 and title_corporate and corporate_distinct >= 1 and event_distinct <= 1 and social_distinct == 0:
+        evidence_class = "case_name_only_routine_project_or_corporate_signal"
+        evidence_note = (
+            "The text/title contains a Marikana-related name but is dominated by project/production/corporate context without substantive "
+            "event, labour, justice, community or governance evidence. This guards against place/mine/project-name false positives."
+        )
+    elif case_total > 0:
+        evidence_class = "case_term_low_context_review"
+        evidence_note = (
+            "A high-specificity place/case term occurs, but contextual evidence is too weak to distinguish substantive Marikana-case treatment "
+            "from a place/project name or incidental historical reference."
         )
     elif title_corporate and corporate_distinct >= 2 and event_distinct <= 1 and social_distinct == 0:
         evidence_class = "strong_routine_corporate_signal"
@@ -197,6 +227,7 @@ for r in triage_rows:
         "corporate_distinct_terms": corporate_distinct,
         "early_aug_oct_2012_window": str(early_2012).lower(),
         "title_has_routine_corporate_signal": str(title_corporate).lower(),
+        "title_has_case_process_signal": str(title_case_process).lower(),
         "evidence_class": evidence_class,
         "evidence_note": evidence_note,
         "final_decision": "",
@@ -215,6 +246,9 @@ summary = {
     "records_processed": len(rows),
     "evidence_class_counts": dict(class_counts),
     "final_decisions_made": 0,
+    "important_boundary": (
+        "Literal Marikana/place/project-name matching is not sufficient. Strong case evidence requires event, labour, justice, community or governance context."
+    ),
     "note": (
         "Evidence classes are decision support only. Final inclusion/exclusion requires the locked screening rubric and an explicit decision ledger entry."
     ),
