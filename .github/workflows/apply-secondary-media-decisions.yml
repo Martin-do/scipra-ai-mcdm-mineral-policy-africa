@@ -1,0 +1,55 @@
+name: Apply secondary media decisions
+
+on:
+  push:
+    branches:
+      - dataset-reconstruction
+    paths:
+      - '.github/workflows/apply-secondary-media-decisions.yml'
+      - 'data/reconstruction/apply_secondary_media_decision_batch_01.py'
+      - 'data/reconstruction/build_secondary_media_review_queue.py'
+      - 'data/reconstruction/secondary_media_targeted_evidence.csv'
+  workflow_dispatch:
+
+concurrency:
+  group: scipra-secondary-media-decisions
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  decide:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout reconstruction branch
+        uses: actions/checkout@v4
+        with:
+          ref: dataset-reconstruction
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Apply conservative secondary Batch 01
+        run: python data/reconstruction/apply_secondary_media_decision_batch_01.py
+
+      - name: Build evidence-priority review queue
+        run: python data/reconstruction/build_secondary_media_review_queue.py
+
+      - name: Show secondary decision summaries
+        run: |
+          cat data/reconstruction/secondary_media_substantive_decision_summary.json
+          cat data/reconstruction/secondary_media_substantive_review_queue_summary.json
+
+      - name: Publish secondary ledger and review queue
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/reconstruction/secondary_media_substantive_decision_ledger.csv data/reconstruction/secondary_media_substantive_decision_summary.json data/reconstruction/secondary_media_substantive_review_queue.csv data/reconstruction/secondary_media_substantive_review_queue_summary.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record secondary media decisions batch 01 and review queue'
+            git pull --rebase origin dataset-reconstruction
+            git push origin HEAD:dataset-reconstruction
+          fi
