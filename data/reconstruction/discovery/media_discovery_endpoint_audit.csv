@@ -84,7 +84,7 @@ Mining Weekly,search,https://www.miningweekly.com/search?query=lonmin,404,html,b
 Engineering News,sitemap,https://www.engineeringnews.co.za/sitemap.xml,200,sitemapindex,locs=29 ctype=text/xml; charset=utf-8
 Engineering News,sitemap,https://www.engineeringnews.co.za/sitemap_index.xml,404,strong,locs=0 ctype=text/html; charset=UTF-8
 Engineering News,sitemap,https://www.engineeringnews.co.za/sitemaps/sitemap-engineering-news-recent.xml,200,urlset,locs=6691 ctype=application/xml
-Engineering News,sitemap,https://www.engineeringnews.co.za/sitemaps/sitemap-engineering-news-news.xml,200,urlset,locs=76 ctype=application/xml
+Engineering News,sitemap,https://www.engineeringnews.co.za/sitemaps/sitemap-engineering-news-news.xml,200,urlset,locs=0 ctype=application/xml
 Engineering News,sitemap,https://www.engineeringnews.co.za/sitemaps/sitemap-engineering-news-topics.xml,200,urlset,locs=4655 ctype=application/xml
 Engineering News,sitemap,https://www.engineeringnews.co.za/sitemaps/sitemap-engineering-news-2026.xml,200,urlset,locs=23520 ctype=application/xml
 Engineering News,sitemap,https://www.engineeringnews.co.za/sitemaps/sitemap-engineering-news-2025.xml,200,urlset,locs=34990 ctype=application/xml
