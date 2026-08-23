@@ -1,0 +1,68 @@
+name: Build SCIPRA external review handoff
+
+on:
+  push:
+    branches:
+      - dataset-reconstruction
+    paths:
+      - '.github/workflows/build-review-handoff.yml'
+      - 'data/reconstruction/build_review_handoff.py'
+  workflow_dispatch:
+
+concurrency:
+  group: scipra-review-handoff
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout dataset branch
+        uses: actions/checkout@v4
+        with:
+          ref: dataset-reconstruction
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install acquisition and QC dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 pypdf trafilatura cryptography pymupdf pytesseract pillow scikit-learn==1.4.2
+
+      - name: Run screened-only acquisition snapshot
+        env:
+          SCIPRA_EXCLUDE_DISCOVERY_DIRECT: '1'
+        run: python data/reconstruction/acquire_corpus_v4.py
+
+      - name: Run screened-only corpus QC
+        run: python data/reconstruction/qc_corpus.py
+
+      - name: Build reviewer handoff directory
+        run: python data/reconstruction/build_review_handoff.py
+
+      - name: Publish reviewer handoff to branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/reconstruction/review_handoff
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish screened corpus external review handoff'
+            git pull --rebase origin dataset-reconstruction
+            git push origin HEAD:dataset-reconstruction
+          fi
+
+      - name: Upload metadata review artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: scipra-external-review-handoff
+          path: data/reconstruction/review_handoff/
+          retention-days: 30
