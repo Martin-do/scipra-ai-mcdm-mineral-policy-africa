@@ -9,6 +9,13 @@ on:
       - 'data/reconstruction/build_archive_media_dedup_audit.py'
       - 'data/reconstruction/media_substantive_decision_ledger.csv'
       - 'data/reconstruction/secondary_media_substantive_decision_ledger.csv'
+  pull_request:
+    types: [synchronize]
+    paths:
+      - '.github/workflows/audit-archive-media-dedup.yml'
+      - 'data/reconstruction/build_archive_media_dedup_audit.py'
+      - 'data/reconstruction/media_substantive_decision_ledger.csv'
+      - 'data/reconstruction/secondary_media_substantive_decision_ledger.csv'
   workflow_dispatch:
 
 concurrency:
