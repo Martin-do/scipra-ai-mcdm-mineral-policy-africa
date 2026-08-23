@@ -1,3 +1,4 @@
+# Explicit trigger for the first acquired-text secondary decision batch.
 name: Apply secondary media decisions
 
 on:
