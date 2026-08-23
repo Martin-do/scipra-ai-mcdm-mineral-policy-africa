@@ -1,6 +1,6 @@
 {
   "Daily Maverick": {
-    "candidate_urls": 598
+    "candidate_urls": 601
   },
   "Mining Weekly": {
     "candidate_urls": 0
@@ -8,5 +8,5 @@
   "Engineering News": {
     "candidate_urls": 1475
   },
-  "total_candidate_urls": 2073
+  "total_candidate_urls": 2076
 }

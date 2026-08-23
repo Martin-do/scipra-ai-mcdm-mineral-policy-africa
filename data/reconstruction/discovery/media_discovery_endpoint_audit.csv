@@ -71,11 +71,11 @@ Daily Maverick,sitemap,https://www.dailymaverick.co.za/article-sitemap66.xml,200
 Daily Maverick,sitemap,https://www.dailymaverick.co.za/article-sitemap67.xml,200,urlset,locs=3811 ctype=application/xml
 Daily Maverick,sitemap,https://www.dailymaverick.co.za/article-sitemap68.xml,200,urlset,locs=3748 ctype=application/xml
 Daily Maverick,sitemap,https://www.dailymaverick.co.za/article-sitemap69.xml,200,urlset,locs=3771 ctype=application/xml
-Daily Maverick,sitemap,https://www.dailymaverick.co.za/article-sitemap70.xml,500,not_xml,locs=0 ctype=application/xml
-Daily Maverick,sitemap,https://www.dailymaverick.co.za/article-sitemap71.xml,200,urlset,locs=2175 ctype=application/xml
-Daily Maverick,sitemap,https://www.dailymaverick.co.za/news-sitemap.xml,200,urlset,locs=45 ctype=application/xml
-Daily Maverick,search,https://www.dailymaverick.co.za/?s=marikana,200,html,bytes=324348
-Daily Maverick,search,https://www.dailymaverick.co.za/?s=lonmin,200,html,bytes=324346
+Daily Maverick,sitemap,https://www.dailymaverick.co.za/article-sitemap70.xml,200,urlset,locs=3812 ctype=application/xml
+Daily Maverick,sitemap,https://www.dailymaverick.co.za/article-sitemap71.xml,200,urlset,locs=2193 ctype=application/xml
+Daily Maverick,sitemap,https://www.dailymaverick.co.za/news-sitemap.xml,200,urlset,locs=14 ctype=application/xml
+Daily Maverick,search,https://www.dailymaverick.co.za/?s=marikana,200,html,bytes=326494
+Daily Maverick,search,https://www.dailymaverick.co.za/?s=lonmin,200,html,bytes=326492
 Mining Weekly,sitemap,https://www.miningweekly.com/sitemap.xml,200,sitemapindex,locs=29 ctype=text/xml; charset=utf-8
 Mining Weekly,sitemap,https://www.miningweekly.com/sitemap_index.xml,404,strong,locs=0 ctype=text/html; charset=UTF-8
 Mining Weekly,sitemap,https://www.miningweekly.com/sitemaps/sitemap-mining-weekly-news.xml,200,urlset,locs=93 ctype=application/xml
