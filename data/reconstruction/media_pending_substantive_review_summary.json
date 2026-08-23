@@ -1,19 +1,7 @@
 {
-  "pending_records": 44,
-  "evidence_class_counts": {
-    "ambiguous_low_signal": 10,
-    "strong_case_context_supported": 26,
-    "possible_substantive_case_context": 6,
-    "likely_routine_corporate_signal": 1,
-    "case_term_low_context_review": 1
-  },
-  "prescreen_bucket_counts": {
-    "explicit_case_title_review": 13,
-    "lonmin_only_title_review": 31
-  },
-  "publisher_counts": {
-    "Daily Maverick": 7,
-    "Engineering News": 37
-  },
+  "pending_records": 0,
+  "evidence_class_counts": {},
+  "prescreen_bucket_counts": {},
+  "publisher_counts": {},
   "note": "Pending-only queue. Blank review fields are intentional; no record in this file has been forced into the corpus."
 }
