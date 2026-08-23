@@ -39,19 +39,19 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Build deterministic exact-dedup audit
+      - name: Build conservative dedup and extraction-collision audit
         run: python data/reconstruction/build_archive_media_dedup_audit.py
 
       - name: Show dedup summary
         run: cat data/reconstruction/archive_media_dedup_summary.json
 
-      - name: Publish dedup audit
+      - name: Publish dedup and text-quality audit
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/reconstruction/archive_media_included_pre_dedup_manifest.csv data/reconstruction/archive_media_text_hash_exceptions.csv data/reconstruction/archive_media_exact_duplicate_clusters.csv data/reconstruction/archive_media_same_title_year_review.csv data/reconstruction/archive_media_same_url_review.csv data/reconstruction/archive_media_exact_dedup_preliminary_manifest.csv data/reconstruction/archive_media_dedup_summary.json
+          git add data/reconstruction/archive_media_included_pre_dedup_manifest.csv data/reconstruction/archive_media_text_hash_exceptions.csv data/reconstruction/archive_media_extraction_hash_collisions.csv data/reconstruction/archive_media_exact_duplicate_clusters.csv data/reconstruction/archive_media_same_title_year_review.csv data/reconstruction/archive_media_same_url_review.csv data/reconstruction/archive_media_exact_dedup_preliminary_manifest.csv data/reconstruction/archive_media_dedup_summary.json
           if ! git diff --cached --quiet; then
-            git commit -m 'Publish archive media exact-dedup audit'
+            git commit -m 'Publish conservative archive media dedup audit'
             git pull --rebase origin dataset-reconstruction
             git push origin HEAD:dataset-reconstruction
           fi
