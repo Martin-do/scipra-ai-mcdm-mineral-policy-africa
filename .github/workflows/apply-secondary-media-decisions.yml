@@ -1,4 +1,4 @@
-# Explicit trigger for the first acquired-text secondary decision batch.
+# Acquired-text secondary media decision workflow.
 name: Apply secondary media decisions
 
 on:
@@ -8,6 +8,7 @@ on:
     paths:
       - '.github/workflows/apply-secondary-media-decisions.yml'
       - 'data/reconstruction/apply_secondary_media_decision_batch_01.py'
+      - 'data/reconstruction/apply_secondary_media_decision_batch_02.py'
       - 'data/reconstruction/build_secondary_media_review_queue.py'
       - 'data/reconstruction/secondary_media_targeted_evidence.csv'
   workflow_dispatch:
@@ -33,10 +34,13 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Apply conservative secondary Batch 01
+      - name: Rebuild conservative secondary Batch 01
         run: python data/reconstruction/apply_secondary_media_decision_batch_01.py
 
-      - name: Build evidence-priority review queue
+      - name: Apply temporal labour secondary Batch 02
+        run: python data/reconstruction/apply_secondary_media_decision_batch_02.py
+
+      - name: Build pending-only evidence review queue
         run: python data/reconstruction/build_secondary_media_review_queue.py
 
       - name: Show secondary decision summaries
@@ -50,7 +54,7 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/reconstruction/secondary_media_substantive_decision_ledger.csv data/reconstruction/secondary_media_substantive_decision_summary.json data/reconstruction/secondary_media_substantive_review_queue.csv data/reconstruction/secondary_media_substantive_review_queue_summary.json
           if ! git diff --cached --quiet; then
-            git commit -m 'Record secondary media decisions batch 01 and review queue'
+            git commit -m 'Record secondary media decisions through batch 02'
             git pull --rebase origin dataset-reconstruction
             git push origin HEAD:dataset-reconstruction
           fi
