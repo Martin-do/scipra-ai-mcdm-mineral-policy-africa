@@ -1,32 +1,33 @@
 {
   "ledger_scope": "1062_secondary_keyword_archive_media_candidates",
   "records_in_ledger": 1062,
-  "final_decisions_made": 916,
-  "final_inclusions": 65,
-  "final_exclusions": 851,
-  "pending_substantive_review": 146,
+  "final_decisions_made": 993,
+  "final_inclusions": 119,
+  "final_exclusions": 874,
+  "pending_substantive_review": 69,
   "decision_status_counts": {
     "final_secondary_batch_01": 916,
-    "pending_substantive_review": 146
+    "pending_substantive_review": 69,
+    "final_secondary_batch_02": 77
   },
   "reason_code_counts": {
     "include_case_central": 48,
-    "review_ambiguous": 146,
+    "review_ambiguous": 69,
+    "include_lonmin_marikana_labour_governance": 21,
     "exclude_no_marikana_lonmin_case_anchor": 841,
-    "exclude_general_corporate_financial": 10,
-    "include_lonmin_marikana_labour_governance": 17
+    "include_2014_platinum_strike_lonmin": 50,
+    "exclude_general_corporate_financial": 24,
+    "exclude_incidental_marikana_reference": 9
   },
-  "batch_01_applied_counts": {
-    "include_case_central": 48,
-    "exclude_no_marikana_lonmin_case_anchor": 841,
-    "exclude_general_corporate_financial": 10,
-    "include_lonmin_marikana_labour_governance": 17
+  "batch_02_applied_counts": {
+    "include_lonmin_marikana_labour_governance": 4,
+    "include_2014_platinum_strike_lonmin": 50,
+    "exclude_general_corporate_financial": 14,
+    "exclude_incidental_marikana_reference": 9
   },
   "pending_evidence_class_counts": {
-    "strong_case_context_supported": 43,
-    "possible_lonmin_substantive_context": 80,
-    "lonmin_low_context_review": 14,
-    "case_term_low_context_review": 9
+    "strong_case_context_supported": 36,
+    "possible_lonmin_substantive_context": 33
   },
-  "important_note": "Secondary Batch 01 excludes only acquired-text records lacking a Marikana/Lonmin anchor plus isolated routine project/corporate name matches, and includes only strong/guarded case evidence. All remaining Marikana/Lonmin-bearing records stay pending. No stance labels, class targets or model outputs were used."
+  "important_note": "Batch 02 excludes low-context background references and admits only 2013-2014 labour/platinum-strike records with an actual Lonmin body-text anchor plus strong labour evidence. Other later or weakly anchored records remain pending."
 }

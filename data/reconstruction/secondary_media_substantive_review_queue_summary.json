@@ -1,20 +1,16 @@
 {
-  "pending_records": 146,
+  "pending_records": 69,
   "evidence_class_counts": {
-    "strong_case_context_supported": 43,
-    "possible_lonmin_substantive_context": 80,
-    "lonmin_low_context_review": 14,
-    "case_term_low_context_review": 9
+    "strong_case_context_supported": 36,
+    "possible_lonmin_substantive_context": 33
   },
   "review_priority_counts": {
-    "0": 43,
-    "1": 80,
-    "3": 14,
-    "2": 9
+    "0": 36,
+    "1": 33
   },
   "publisher_counts": {
-    "Daily Maverick": 28,
-    "Engineering News": 118
+    "Daily Maverick": 19,
+    "Engineering News": 50
   },
   "priority_order": {
     "strong_case_context_supported": 0,
