@@ -12,6 +12,7 @@ on:
       - 'data/reconstruction/apply_media_decision_batch_03_expand_690.py'
       - 'data/reconstruction/apply_media_decision_batch_04.py'
       - 'data/reconstruction/apply_media_decision_batch_05.py'
+      - 'data/reconstruction/apply_media_decision_batch_06.py'
       - 'data/reconstruction/build_media_pending_review_queue.py'
       - 'data/reconstruction/low_signal_substantive_evidence.csv'
       - 'data/reconstruction/media_targeted_substantive_evidence.csv'
@@ -53,7 +54,10 @@ jobs:
       - name: Apply explicit residual reviewed decision batch 05
         run: python data/reconstruction/apply_media_decision_batch_05.py
 
-      - name: Build compact pending-only review queue
+      - name: Resolve final title-trigger records with batch 06
+        run: python data/reconstruction/apply_media_decision_batch_06.py
+
+      - name: Build pending-only review queue
         run: python data/reconstruction/build_media_pending_review_queue.py
 
       - name: Show cumulative decision and pending summaries
@@ -63,11 +67,11 @@ jobs:
 
       - name: Publish ledger, summary and pending queue
         run: |
-          git config user.name 'github-actions[bot]'
+          git config user.name 'github-actions[bot]]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/reconstruction/media_substantive_decision_ledger.csv data/reconstruction/media_substantive_decision_summary.json data/reconstruction/media_pending_substantive_review.csv data/reconstruction/media_pending_substantive_review_summary.json
           if ! git diff --cached --quiet; then
-            git commit -m 'Publish media decisions through batch 05 and pending queue'
+            git commit -m 'Publish completed title-trigger media substantive decisions'
             git pull --rebase origin dataset-reconstruction
             git push origin HEAD:dataset-reconstruction
           fi
