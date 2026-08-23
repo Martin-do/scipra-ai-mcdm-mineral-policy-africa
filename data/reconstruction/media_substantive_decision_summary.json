@@ -6,20 +6,25 @@
   "final_exclusions": 59,
   "pending_substantive_review": 77,
   "decision_status_counts": {
-    "final_batch_01": 26,
-    "final_batch_02": 51,
+    "final_batch_01": 25,
+    "final_batch_02": 52,
     "pending_substantive_review": 77
   },
   "reason_code_counts": {
     "include_case_central": 18,
-    "exclude_general_corporate_financial": 52,
-    "exclude_other_mine_or_event": 7,
+    "exclude_general_corporate_financial": 51,
+    "exclude_other_mine_or_event": 8,
     "review_ambiguous": 77
   },
-  "batch_02_explicit_review_counts": {
+  "batch_02_review_list_sizes": {
     "include_case_central": 17,
     "exclude_general_corporate_financial": 27,
     "exclude_other_mine_or_event": 8
   },
-  "important_note": "Batch 02 uses explicit reviewed candidate-ID lists. Ambiguous ownership-transition, merger/job/community, and extraction-stub records remain pending. No stance label, historical class target or model result was used."
+  "batch_02_applied_counts": {
+    "exclude_general_corporate_financial": 27,
+    "exclude_other_mine_or_event": 8,
+    "include_case_central": 17
+  },
+  "important_note": "Batch 02 uses explicit reviewed candidate-ID lists and supersedes a generic batch-01 reason where a more specific reviewed reason is available. Ambiguous ownership-transition, merger/job/community and extraction-stub records remain pending. No stance label, historical class target or model result was used."
 }
