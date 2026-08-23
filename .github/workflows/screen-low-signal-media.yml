@@ -1,0 +1,59 @@
+name: Screen low-signal Lonmin media
+
+on:
+  push:
+    branches:
+      - dataset-reconstruction
+    paths:
+      - '.github/workflows/screen-low-signal-media.yml'
+      - 'data/reconstruction/screen_low_signal_media.py'
+      - 'data/reconstruction/media_substantive_screen_triage.csv'
+  pull_request:
+    branches:
+      - main
+    types:
+      - synchronize
+      - reopened
+  workflow_dispatch:
+
+concurrency:
+  group: scipra-low-signal-media-screen
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout reconstruction branch
+        uses: actions/checkout@v4
+        with:
+          ref: dataset-reconstruction
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install lightweight extraction dependencies
+        run: pip install requests beautifulsoup4 trafilatura
+
+      - name: Fetch and derive evidence for 154 low-signal records
+        run: python data/reconstruction/screen_low_signal_media.py
+
+      - name: Show targeted screening summary
+        run: cat data/reconstruction/low_signal_substantive_evidence_summary.json
+
+      - name: Publish metadata evidence only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/reconstruction/low_signal_substantive_evidence.csv data/reconstruction/low_signal_substantive_evidence_summary.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record targeted low-signal media screening evidence'
+            git pull --rebase origin dataset-reconstruction
+            git push origin HEAD:dataset-reconstruction
+          fi
