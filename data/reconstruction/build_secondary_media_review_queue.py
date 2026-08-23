@@ -1,8 +1,8 @@
-"""Build a reviewer-focused queue from secondary archive media evidence.
+"""Build the pending-only reviewer queue for secondary archive media.
 
-This helper does not decide membership. It groups the 1,062 evidence rows into
-review priorities so high-value hidden body-text case matches can be examined
-before low-information/no-anchor material. Final decision fields stay blank.
+The decision ledger is the source of truth. Only records still marked
+`pending_substantive_review` are emitted; evidence metadata is joined back in for
+row-level review. This helper makes no membership decisions.
 """
 from __future__ import annotations
 
@@ -14,21 +14,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 RECON = ROOT / "data" / "reconstruction"
 EVIDENCE = RECON / "secondary_media_targeted_evidence.csv"
+LEDGER = RECON / "secondary_media_substantive_decision_ledger.csv"
 OUT = RECON / "secondary_media_substantive_review_queue.csv"
 SUMMARY = RECON / "secondary_media_substantive_review_queue_summary.json"
 
 PRIORITY = {
-    "strong_early_2012_event_context": 0,
-    "strong_case_context_supported": 1,
-    "strong_lonmin_context_supported": 2,
-    "possible_lonmin_substantive_context": 3,
-    "case_term_low_context_review": 4,
-    "sibanye_context_without_case_anchor_review": 5,
-    "lonmin_low_context_review": 6,
-    "ambiguous_secondary_review": 7,
-    "acquisition_or_text_exception": 8,
-    "strong_routine_no_case_anchor": 9,
-    "no_case_anchor": 10,
+    "strong_case_context_supported": 0,
+    "possible_lonmin_substantive_context": 1,
+    "case_term_low_context_review": 2,
+    "lonmin_low_context_review": 3,
 }
 
 
@@ -37,15 +31,20 @@ def read_rows(path: Path):
         return list(csv.DictReader(f))
 
 
-rows = read_rows(EVIDENCE)
-if len(rows) != 1062:
-    raise RuntimeError(f"Expected 1062 secondary evidence rows, found {len(rows)}")
+evidence_rows = read_rows(EVIDENCE)
+ledger_rows = read_rows(LEDGER)
+if len(evidence_rows) != 1062 or len(ledger_rows) != 1062:
+    raise RuntimeError(f"Expected 1062 evidence + ledger rows; got {len(evidence_rows)} and {len(ledger_rows)}")
+
+evidence = {r["candidate_id"]: r for r in evidence_rows}
+pending = [r for r in ledger_rows if r.get("decision_status") == "pending_substantive_review"]
 
 out_rows = []
 class_counts = Counter()
 priority_counts = Counter()
 publisher_counts = Counter()
-for r in rows:
+for d in pending:
+    r = evidence[d["candidate_id"]]
     klass = r.get("evidence_class", "")
     rank = PRIORITY.get(klass, 99)
     class_counts[klass] += 1
@@ -60,7 +59,6 @@ for r in rows:
         "publication_date_from_url": r.get("publication_date_from_url", ""),
         "publisher": r.get("publisher", ""),
         "url": r.get("url", ""),
-        "targeted_fetch_status": r.get("targeted_fetch_status", ""),
         "retrieved_text_words": r.get("retrieved_text_words", ""),
         "retrieved_text_sha256": r.get("retrieved_text_sha256", ""),
         "retrieved_lonmin_mentions": r.get("retrieved_lonmin_mentions", ""),
@@ -81,21 +79,19 @@ for r in rows:
 
 out_rows.sort(key=lambda r: (int(r["review_priority"]), r["year"], r["candidate_id"]))
 with OUT.open("w", encoding="utf-8", newline="") as f:
-    writer = csv.DictWriter(f, fieldnames=list(out_rows[0].keys()))
-    writer.writeheader()
-    writer.writerows(out_rows)
+    if out_rows:
+        writer = csv.DictWriter(f, fieldnames=list(out_rows[0].keys()))
+        writer.writeheader(); writer.writerows(out_rows)
+    else:
+        f.write("candidate_id,review_priority,evidence_class,title,year,publication_date_from_url,publisher,url\n")
 
 summary = {
-    "records_in_review_queue": len(out_rows),
+    "pending_records": len(out_rows),
     "evidence_class_counts": dict(class_counts),
     "review_priority_counts": dict(priority_counts),
     "publisher_counts": dict(publisher_counts),
     "priority_order": PRIORITY,
-    "final_decisions_made": 0,
-    "note": (
-        "Reviewer queue only. Priority is for review efficiency, not corpus eligibility. "
-        "No row is included or excluded by this builder."
-    ),
+    "note": "Pending-only reviewer queue; blank review fields are intentional and no decision is made by this builder.",
 }
 SUMMARY.write_text(json.dumps(summary, indent=2), encoding="utf-8")
 print(json.dumps(summary, indent=2))
