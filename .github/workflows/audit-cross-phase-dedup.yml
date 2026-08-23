@@ -1,3 +1,4 @@
+# Triggered after first creation so GitHub Actions observes the workflow on the branch.
 name: Audit SCIPRA cross-phase deduplication
 
 on:
