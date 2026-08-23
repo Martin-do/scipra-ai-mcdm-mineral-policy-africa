@@ -1,0 +1,20 @@
+{
+  "pending_records": 133,
+  "evidence_class_counts": {
+    "strong_case_context_supported": 30,
+    "ambiguous_low_signal": 51,
+    "possible_substantive_case_context": 35,
+    "acquisition_or_text_exception": 2,
+    "likely_routine_corporate_signal": 6,
+    "case_term_low_context_review": 9
+  },
+  "prescreen_bucket_counts": {
+    "explicit_case_title_review": 35,
+    "lonmin_only_title_review": 98
+  },
+  "publisher_counts": {
+    "Daily Maverick": 14,
+    "Engineering News": 119
+  },
+  "note": "Pending-only queue. Blank review fields are intentional; no record in this file has been forced into the corpus."
+}
