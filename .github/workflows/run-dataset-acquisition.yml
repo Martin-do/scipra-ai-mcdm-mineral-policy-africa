@@ -1,4 +1,4 @@
-name: Observe reconstructed media discovery
+name: Build observable SCIPRA review handoff
 
 on:
   pull_request:
@@ -8,16 +8,16 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: scipra-media-discovery-observable
+  group: scipra-review-handoff-observable
   cancel-in-progress: true
 
 permissions:
   contents: write
 
 jobs:
-  discover:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Checkout dataset reconstruction branch
         uses: actions/checkout@v4
@@ -28,16 +28,32 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install requests beautifulsoup4
-      - name: Discover documented publisher URLs
-        run: python data/reconstruction/discover_media_urls.py
-      - name: Publish discovery audit to dataset branch
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 pypdf trafilatura cryptography pymupdf pytesseract pillow scikit-learn==1.4.2
+      - name: Run screened-only acquisition snapshot
+        env:
+          SCIPRA_EXCLUDE_DISCOVERY_DIRECT: '1'
+        run: python data/reconstruction/acquire_corpus_v4.py
+      - name: Run screened-only corpus QC
+        run: python data/reconstruction/qc_corpus.py
+      - name: Build reviewer handoff
+        run: python data/reconstruction/build_review_handoff.py
+      - name: Publish reviewer handoff to dataset branch
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/reconstruction/discovery
+          git add data/reconstruction/review_handoff
           if ! git diff --cached --quiet; then
-            git commit -m 'Record publisher media discovery audit'
+            git commit -m 'Publish screened corpus external review handoff'
             git pull --rebase origin dataset-reconstruction
             git push origin HEAD:dataset-reconstruction
           fi
+      - name: Upload review handoff artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: scipra-external-review-handoff
+          path: data/reconstruction/review_handoff/
+          retention-days: 30
