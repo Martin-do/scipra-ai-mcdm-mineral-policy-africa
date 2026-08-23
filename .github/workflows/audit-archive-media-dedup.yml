@@ -1,0 +1,50 @@
+name: Audit archive media deduplication
+
+on:
+  push:
+    branches:
+      - dataset-reconstruction
+    paths:
+      - '.github/workflows/audit-archive-media-dedup.yml'
+      - 'data/reconstruction/build_archive_media_dedup_audit.py'
+      - 'data/reconstruction/media_substantive_decision_ledger.csv'
+      - 'data/reconstruction/secondary_media_substantive_decision_ledger.csv'
+  workflow_dispatch:
+
+concurrency:
+  group: scipra-archive-media-dedup-audit
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout reconstruction branch
+        uses: actions/checkout@v4
+        with:
+          ref: dataset-reconstruction
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build deterministic exact-dedup audit
+        run: python data/reconstruction/build_archive_media_dedup_audit.py
+
+      - name: Show dedup summary
+        run: cat data/reconstruction/archive_media_dedup_summary.json
+
+      - name: Publish dedup audit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/reconstruction/archive_media_included_pre_dedup_manifest.csv data/reconstruction/archive_media_exact_duplicate_clusters.csv data/reconstruction/archive_media_same_title_year_review.csv data/reconstruction/archive_media_same_url_review.csv data/reconstruction/archive_media_exact_dedup_preliminary_manifest.csv data/reconstruction/archive_media_dedup_summary.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish archive media exact-dedup audit'
+            git pull --rebase origin dataset-reconstruction
+            git push origin HEAD:dataset-reconstruction
+          fi
