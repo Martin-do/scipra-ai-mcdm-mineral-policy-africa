@@ -1,0 +1,121 @@
+name: Build SCIPRA offline reviewer bundle
+
+on:
+  push:
+    branches: [post-freeze-analysis]
+    paths:
+      - '.github/workflows/build-offline-review-bundle.yml'
+      - 'code/reconcile_post_freeze_annotation_summary.py'
+      - 'data/post_freeze_analysis/REVIEWER_HANDOFF.md'
+      - 'data/post_freeze_analysis/.offline-review-trigger'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: post-freeze-analysis
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Reconcile annotation accounting
+        run: python code/reconcile_post_freeze_annotation_summary.py
+
+      - name: Build exact offline reviewer bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$PWD"
+          STAGE="$RUNNER_TEMP/SCIPRA_offline_reviewer_bundle"
+          rm -rf "$STAGE"
+          mkdir -p "$STAGE/01_CORPUS_FREEZE" "$STAGE/02_POST_FREEZE_ANALYSIS" "$STAGE/03_REPRODUCTION_CODE" "$STAGE/04_STATUS_AND_GUIDES"
+
+          cp data/reconstruction/scipra_corpus_freeze_handoff.zip "$STAGE/01_CORPUS_FREEZE/"
+          cp data/reconstruction/review_handoff/canonical_reconstructed_replication_corpus.csv "$STAGE/01_CORPUS_FREEZE/"
+          cp data/reconstruction/review_handoff/canonical_analysis_ready_manifest.csv "$STAGE/01_CORPUS_FREEZE/"
+          cp data/reconstruction/review_handoff/corpus_freeze_summary.json "$STAGE/01_CORPUS_FREEZE/"
+          cp data/reconstruction/review_handoff/corpus_freeze_hashes.json "$STAGE/01_CORPUS_FREEZE/"
+          cp data/reconstruction/review_handoff/README.md "$STAGE/01_CORPUS_FREEZE/CORPUS_REVIEW_README.md"
+          cp data/reconstruction/review_handoff/REVIEWER_CHECKLIST.md "$STAGE/01_CORPUS_FREEZE/"
+          cp data/reconstruction/RECONSTRUCTION_PROTOCOL.md "$STAGE/01_CORPUS_FREEZE/"
+          cp data/reconstruction/MEDIA_SUBSTANTIVE_SCREENING_RUBRIC.md "$STAGE/01_CORPUS_FREEZE/"
+
+          cp data/post_freeze_analysis/annotation_pass_summary.json "$STAGE/02_POST_FREEZE_ANALYSIS/"
+          cp data/post_freeze_analysis/annotation_count_reconciliation.json "$STAGE/02_POST_FREEZE_ANALYSIS/"
+          cp data/post_freeze_analysis/reconstructed_annotation_draft.csv "$STAGE/02_POST_FREEZE_ANALYSIS/"
+          cp data/post_freeze_analysis/annotation_review_queue.csv "$STAGE/02_POST_FREEZE_ANALYSIS/"
+          cp data/post_freeze_analysis/post_freeze_recovery_status.csv "$STAGE/02_POST_FREEZE_ANALYSIS/"
+          cp data/post_freeze_analysis/mcdm_reproducibility_audit.json "$STAGE/02_POST_FREEZE_ANALYSIS/"
+          cp data/post_freeze_analysis/scenario_formula_validation.csv "$STAGE/02_POST_FREEZE_ANALYSIS/"
+          cp data/post_freeze_analysis/mathematical_audit_hashes.json "$STAGE/02_POST_FREEZE_ANALYSIS/"
+          if [ -f data/post_freeze_analysis/annotation_protocol_excerpt.txt ]; then cp data/post_freeze_analysis/annotation_protocol_excerpt.txt "$STAGE/02_POST_FREEZE_ANALYSIS/"; fi
+
+          cp code/post_freeze_annotation_pass.py "$STAGE/03_REPRODUCTION_CODE/"
+          cp code/reconcile_post_freeze_annotation_summary.py "$STAGE/03_REPRODUCTION_CODE/"
+          cp code/finalize_post_freeze_annotations.py "$STAGE/03_REPRODUCTION_CODE/"
+          cp code/run_post_freeze_model_analysis.py "$STAGE/03_REPRODUCTION_CODE/"
+          cp code/audit_post_freeze_mcdm_formulas.py "$STAGE/03_REPRODUCTION_CODE/"
+          cp code/build_post_freeze_analysis_report.py "$STAGE/03_REPRODUCTION_CODE/"
+          cp code/dynamic_weighting.py "$STAGE/03_REPRODUCTION_CODE/" || true
+          cp code/pci_computation.py "$STAGE/03_REPRODUCTION_CODE/" || true
+
+          cp data/post_freeze_analysis/REVIEWER_HANDOFF.md "$STAGE/START_HERE.md"
+          cp data/post_freeze_analysis/REVIEWER_HANDOFF.md "$STAGE/04_STATUS_AND_GUIDES/REVIEWER_HANDOFF.md"
+
+          cat > "$STAGE/04_STATUS_AND_GUIDES/OFFLINE_PACKAGE_NOTE.txt" <<'EOF'
+          This package contains the exact committed row-level corpus and post-freeze audit files needed for offline review.
+
+          Important annotation accounting:
+          - 876 frozen analysis-ready records
+          - 873 texts recovered, 3 unavailable
+          - 735 draft stance labels assigned in total
+          - 687 labeled and not queued
+          - 48 labeled but queued for low-confidence stakeholder attribution
+          - 138 recovered records unlabeled and queued for stance adjudication
+          - 3 unavailable records queued
+          - Review queue total = 48 + 138 + 3 = 189
+
+          The review queue therefore overlaps the labeled set by 48 records. Do not add 735 + 189 as disjoint categories.
+          EOF
+
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json
+          stage=Path(r'''${STAGE}''')
+          rows=[]
+          for p in sorted(stage.rglob('*')):
+              if p.is_file():
+                  h=hashlib.sha256(p.read_bytes()).hexdigest()
+                  rows.append({'path':str(p.relative_to(stage)),'sha256':h,'bytes':p.stat().st_size})
+          (stage/'OFFLINE_PACKAGE_SHA256_MANIFEST.json').write_text(json.dumps(rows,indent=2)+'\n',encoding='utf-8')
+          PY
+
+          cd "$RUNNER_TEMP"
+          zip -r -9 SCIPRA_OFFLINE_REVIEWER_BUNDLE.zip SCIPRA_offline_reviewer_bundle >/dev/null
+          mv SCIPRA_OFFLINE_REVIEWER_BUNDLE.zip "$ROOT/SCIPRA_OFFLINE_REVIEWER_BUNDLE.zip"
+
+      - name: Publish corrected reconciliation metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/post_freeze_analysis/annotation_pass_summary.json data/post_freeze_analysis/annotation_count_reconciliation.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish reconciled annotation accounting'
+            git push origin HEAD:post-freeze-analysis
+          fi
+
+      - name: Upload offline reviewer bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: SCIPRA_OFFLINE_REVIEWER_BUNDLE
+          path: SCIPRA_OFFLINE_REVIEWER_BUNDLE.zip
+          retention-days: 30
