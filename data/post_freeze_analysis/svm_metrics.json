@@ -1,46 +1,46 @@
 {
-  "accuracy": 0.9368029739776952,
-  "balanced_accuracy": 0.7850026685643123,
+  "accuracy": 0.9229813664596274,
+  "balanced_accuracy": 0.7481735159817351,
   "class_counts_model_evaluable": {
     "0": 730,
-    "1": 77
+    "1": 75
   },
   "classification_report": {
-    "accuracy": 0.9368029739776952,
+    "accuracy": 0.9229813664596274,
     "macro avg": {
-      "f1-score": 0.8043431755192463,
-      "precision": 0.8275671696724329,
-      "recall": 0.7850026685643123,
-      "support": 807.0
+      "f1-score": 0.7605729746325364,
+      "precision": 0.7747947255591958,
+      "recall": 0.7481735159817351,
+      "support": 805.0
     },
     "pro_integration": {
-      "f1-score": 0.6433566433566433,
-      "precision": 0.696969696969697,
-      "recall": 0.5974025974025974,
-      "support": 77.0
+      "f1-score": 0.5633802816901409,
+      "precision": 0.5970149253731343,
+      "recall": 0.5333333333333333,
+      "support": 75.0
     },
     "resistant": {
-      "f1-score": 0.9653297076818491,
-      "precision": 0.9581646423751687,
-      "recall": 0.9726027397260274,
+      "f1-score": 0.9577656675749319,
+      "precision": 0.9525745257452575,
+      "recall": 0.963013698630137,
       "support": 730.0
     },
     "weighted avg": {
-      "f1-score": 0.9346086098466064,
-      "precision": 0.9332426959114496,
-      "recall": 0.9368029739776952,
-      "support": 807.0
+      "f1-score": 0.9210216875235538,
+      "precision": 0.9194478549031341,
+      "recall": 0.9229813664596274,
+      "support": 805.0
     }
   },
-  "cohen_kappa_oof_vs_reconstructed_target": 0.6089113144616437,
+  "cohen_kappa_oof_vs_reconstructed_target": 0.5212929215422981,
   "confusion_matrix_labels_0_1": [
     [
-      710,
-      20
+      703,
+      27
     ],
     [
-      31,
-      46
+      35,
+      40
     ]
   ],
   "cv": {
@@ -49,15 +49,15 @@
     "shuffle": true,
     "type": "StratifiedKFold"
   },
-  "execution_text_unavailable_excluded": 0,
-  "f1_pro_integration": 0.6433566433566433,
+  "execution_text_unavailable_excluded": 2,
+  "f1_pro_integration": 0.5633802816901409,
   "final_reconstructed_label_records": 807,
   "frozen_analysis_manifest_sha256": "cb280e4cb138b2f6bba48b24f0dcd7521c4cb821871846ceb70523a05a7acad5",
   "important_limitation": "Metrics quantify cross-validated agreement with computationally reconstructed B.4.2 labels, not unavailable historical human labels.",
-  "model_evaluable_records_after_fresh_text_recovery": 807,
-  "precision_pro_integration": 0.696969696969697,
-  "recall_pro_integration": 0.5974025974025974,
-  "roc_auc_pro_integration": 0.9414161181284468,
+  "model_evaluable_records_after_fresh_text_recovery": 805,
+  "precision_pro_integration": 0.5970149253731343,
+  "recall_pro_integration": 0.5333333333333333,
+  "roc_auc_pro_integration": 0.9372054794520548,
   "stage": "post_freeze_tfidf_rbf_svm_oof_evaluation_v2",
   "svm": {
     "C": 1.0,
