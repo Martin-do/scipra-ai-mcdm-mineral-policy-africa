@@ -1,15 +1,8 @@
-# Registered after creation so the analysis workflow executes from an existing branch workflow.
 name: Run SCIPRA post-freeze annotation pass
 
 on:
   push:
     branches: [post-freeze-analysis]
-    paths:
-      - 'code/post_freeze_annotation_pass.py'
-      - '.github/workflows/post-freeze-annotation-pass.yml'
-  pull_request:
-    branches: [dataset-reconstruction]
-    types: [synchronize, opened, reopened]
     paths:
       - 'code/post_freeze_annotation_pass.py'
       - '.github/workflows/post-freeze-annotation-pass.yml'
@@ -51,8 +44,7 @@ jobs:
             data/post_freeze_analysis/annotation_review_queue.csv
             data/post_freeze_analysis/annotation_pass_summary.json
           retention-days: 30
-      - name: Publish derived annotation metadata on push only
-        if: github.event_name != 'pull_request'
+      - name: Publish derived annotation metadata
         shell: bash
         run: |
           set -euo pipefail
