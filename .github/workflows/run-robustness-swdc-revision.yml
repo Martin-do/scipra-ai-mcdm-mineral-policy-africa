@@ -7,6 +7,8 @@ on:
       - 'code/analyze_stance_robustness.py'
       - 'code/audit_corrected_swdc_candidate.py'
       - 'code/derive_criterion_relevance_matrix.py'
+      - 'code/audit_revision_component_ablation.py'
+      - 'code/audit_criterion_semantic_sensitivity.py'
       - '.github/workflows/run-robustness-swdc-revision.yml'
       - 'data/revision_analysis/.trigger'
       - 'data/revision_analysis/CRITERION_RELEVANCE_PROTOCOL.md'
@@ -42,6 +44,12 @@ jobs:
       - name: Derive preregistered criterion-relevance matrix
         run: python code/derive_criterion_relevance_matrix.py
 
+      - name: Run component ablation
+        run: python code/audit_revision_component_ablation.py
+
+      - name: Run post-hoc semantic sensitivity audit
+        run: python code/audit_criterion_semantic_sensitivity.py
+
       - name: Assert revision boundary and outputs
         run: |
           python - <<'PY'
@@ -51,6 +59,7 @@ jobs:
           stance=json.loads((p/'stance_robustness_summary.json').read_text())
           swdc=json.loads((p/'corrected_swdc_candidate_summary.json').read_text())
           rel=json.loads((p/'criterion_relevance_summary.json').read_text())
+          sem=json.loads((p/'criterion_semantic_sensitivity_summary.json').read_text())
           assert stance['frozen_analysis_ready_records']==876
           assert stance['pass1']['resistant']==672 and stance['pass1']['pro_integration']==63
           assert stance['final_reconstructed_ledger']['resistant']==730 and stance['final_reconstructed_ledger']['pro_integration']==77
@@ -61,7 +70,9 @@ jobs:
           assert rel['eligible_resolved_stakeholder_records']==776
           assert rel['historical_parameter_recovery_claim'] is False
           assert rel['revision_claim'] is True
-          print(json.dumps({'stance':stance,'swdc_candidate':swdc,'criterion_relevance':rel}, indent=2))
+          assert sem['status']=='sensitivity_only_does_not_replace_preregistered_primary'
+          assert sem['fresh_recovered_total'] >= 770
+          print(json.dumps({'stance':stance,'swdc_candidate':swdc,'criterion_relevance':rel,'semantic_sensitivity':sem}, indent=2))
           PY
 
       - name: Publish revision-audit outputs
@@ -80,7 +91,7 @@ jobs:
             cp "$STAGE"/* data/revision_analysis/ 2>/dev/null || true
             git add data/revision_analysis/
             if git diff --cached --quiet; then exit 0; fi
-            git commit -m 'Publish robustness and data-derived SWDC revision audit'
+            git commit -m 'Publish robustness and semantic sensitivity revision audit'
             if git push origin HEAD:robustness-swdc-revision; then exit 0; fi
             sleep $((attempt*3))
           done
