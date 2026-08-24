@@ -1,0 +1,53 @@
+name: Audit SCIPRA textwide near duplicates
+
+on:
+  push:
+    branches:
+      - dataset-reconstruction
+    paths:
+      - '.github/workflows/audit-textwide-near-duplicates.yml'
+      - 'data/reconstruction/audit_textwide_near_duplicates.py'
+      - 'data/reconstruction/prefreeze_manifest_after_broad_duplicate_review.csv'
+  workflow_dispatch:
+
+concurrency:
+  group: scipra-textwide-near-duplicate-audit
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout reconstruction branch
+        uses: actions/checkout@v4
+        with:
+          ref: dataset-reconstruction
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install extraction and similarity dependencies
+        run: pip install requests beautifulsoup4 trafilatura pypdf scikit-learn==1.4.2
+
+      - name: Run final textwide near-duplicate evidence audit
+        run: python data/reconstruction/audit_textwide_near_duplicates.py
+
+      - name: Show textwide audit summary
+        run: cat data/reconstruction/textwide_near_duplicate_summary.json
+
+      - name: Publish metadata-only textwide audit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/reconstruction/textwide_recovery_status.csv data/reconstruction/textwide_near_duplicate_candidates.csv data/reconstruction/textwide_near_duplicate_summary.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish SCIPRA textwide near-duplicate evidence'
+            git pull --rebase origin dataset-reconstruction
+            git push origin HEAD:dataset-reconstruction
+          fi
