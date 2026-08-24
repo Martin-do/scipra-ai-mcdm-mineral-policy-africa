@@ -34,37 +34,37 @@ Unresolved stakeholder identity does not invalidate a record's finalized stance 
 
 TF-IDF is fitted inside every training fold. The evaluation target is the reconstructed computational stance ledger, not unavailable historical human labels.
 
-- Freshly model-evaluable records: **805**
+- Freshly model-evaluable records: **806**
 - CV folds: **5**
-- Accuracy: **0.9230**
-- Balanced accuracy: **0.7482**
-- Precision, pro-integration: **0.5970**
-- Recall, pro-integration: **0.5333**
-- F1, pro-integration: **0.5634**
-- ROC AUC: **0.9372**
-- Cohen's kappa: **0.5213**
-- Confusion matrix `[0,1]`: `[[703, 27], [35, 40]]`
+- Accuracy: **0.9305**
+- Balanced accuracy: **0.7554**
+- Precision, pro-integration: **0.6613**
+- Recall, pro-integration: **0.5395**
+- F1, pro-integration: **0.5942**
+- ROC AUC: **0.9395**
+- Cohen's kappa: **0.5566**
+- Confusion matrix `[0,1]`: `[[709, 21], [35, 41]]`
 
 ## Resolved stakeholder acceptance proxies
 
 | Group | resolved n | Mean OOF P(pro-integration) | SIC |
 |---|---:|---:|---:|
-| government | 318 | 0.0546 | 0.703 |
-| investor | 147 | 0.2634 | 0.770 |
-| community | 33 | 0.1833 | 0.749 |
-| labour | 244 | 0.0439 | 0.807 |
-| NGO | 32 | 0.0453 | 0.686 |
+| government | 319 | 0.0537 | 0.703 |
+| investor | 147 | 0.2739 | 0.770 |
+| community | 33 | 0.1846 | 0.749 |
+| labour | 244 | 0.0443 | 0.807 |
+| NGO | 32 | 0.0537 | 0.686 |
 
 ## Corpus-derived operational proxy indices
 
-- Investment proxy: **0.2634**
-- Regulatory proxy: **0.0546**
-- SIC-weighted stakeholder proxy: **0.1198**
-- Linear PCI proxy: **0.1401**
-- Weighted cross-domain sigma: **0.0852**
-- RPCI raw proxy: **0.1315**
-- RPCI normalized A.10 proxy: **0.1253**
-- Nonlinear PCI proxy: **0.1178**
+- Investment proxy: **0.2739**
+- Regulatory proxy: **0.0537**
+- SIC-weighted stakeholder proxy: **0.1237**
+- Linear PCI proxy: **0.1443**
+- Weighted cross-domain sigma: **0.0898**
+- RPCI raw proxy: **0.1353**
+- RPCI normalized A.10 proxy: **0.1288**
+- Nonlinear PCI proxy: **0.1200**
 
 These are operational proxies derived from OOF group acceptance probabilities. They are **not** independent reconstructions of the manuscript's FAHP investment/regulatory scenario scores.
 
