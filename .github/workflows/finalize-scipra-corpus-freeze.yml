@@ -1,3 +1,4 @@
+# Deterministic membership freeze; this edit also triggers the first workflow run.
 name: Finalize SCIPRA reconstructed corpus freeze
 
 on:
