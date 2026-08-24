@@ -19,87 +19,57 @@ Therefore revised SCIPRA should not claim novelty simply for allowing different 
 
 ### Text analytics combined with MCDM
 
-Text-driven MCDM is established. For example:
+Text-driven MCDM is also established. For example:
 
-- Pérez Rave, Jaramillo Álvarez & Correa Morales (2022), *Multi-criteria decision-making leveraged by text analytics and interviews with strategists*, **Journal of Marketing Analytics 10(1), 30–49**, DOI: `10.1057/s41270-021-00125-8`.
-- Other text-mining/MCDM studies derive criteria or objective weights from topic frequencies/proportions and other textual signals.
+- Pérez Rave, Jaramillo Álvarez & Correa Morales (2022), *Multi-criteria decision-making leveraged by text analytics and interviews with strategists*, **Journal of Marketing Analytics 10(1), 30–49**, DOI: `10.1057/s41270-021-00125-8`. The framework uses text analytics to discover, validate and prioritize decision patterns/criteria.
+- Text-mining/MCDM studies also derive criteria or objective weights from topic frequencies/proportions and other textual signals.
 
 Therefore revised SCIPRA should not claim novelty simply for combining NLP/text mining with MCDM.
 
 ### Sentiment analysis combined with MCDM
 
-Prior decision frameworks combine aspect-level sentiment/text mining with MCDM ranking methods. Therefore an NLP-derived positive/negative signal alone is not a sufficient novelty claim.
+Prior decision frameworks combine aspect-level sentiment/text mining with MCDM ranking methods. Therefore the use of an NLP-derived positive/negative signal in a decision framework is not sufficient as a novelty claim.
 
 ### Stakeholder salience theory
 
-Power–Legitimacy–Urgency stakeholder salience is established. Dynamic/context-sensitive stakeholder salience mapping also predates SCIPRA. The revision must therefore not claim novelty for SIC/PLU alone.
+Power–Legitimacy–Urgency stakeholder salience is an established theoretical construct. Dynamic or context-sensitive stakeholder salience mapping also predates SCIPRA. The revision must therefore not claim novelty for SIC/PLU alone.
 
-## Structural problem revealed by reconstruction
+## Candidate gap identified by the present reconstruction
 
-The historical SCIPRA code attempted to propagate stakeholder salience into criterion weights using one common scalar multiplier:
+The historical SCIPRA code attempted to propagate stakeholder salience into criterion weights using one scalar multiplier:
 
 `W_a = W_0 * (1 + delta*SIC)`
 
-followed by vector normalization. The reconstruction proves that this common multiplier cancels, leaving relative criterion weights unchanged.
+followed by vector normalization. The reconstruction proves that the common multiplier cancels, leaving relative criterion weights unchanged.
 
-The principal methodological requirement exposed by the audit is therefore **criterion specificity before normalization**.
-
-## Proposed non-degenerate architecture
-
-The revision makes the missing stakeholder-by-criterion object explicit:
+The proposed revision introduces the missing criterion-specific object explicitly:
 
 - structural stakeholder salience: `SIC_s`
-- stakeholder-by-criterion documentary relevance: `A_sj`
-- optional observed contention modifier: `C_s = 1 - P_s(pro-integration)`
-- optional salience/contention pressure: `E_s = SIC_s*C_s`
+- observed stakeholder contention: `C_s = 1 - P_s(pro-integration)`
+- stakeholder-by-criterion discourse relevance: `A_sj`
+- salience-weighted pressure: `E_s = SIC_s*C_s`
 - criterion-specific pressure: `G_j = sum_s(E_s*A_sj)/sum_s(E_s)`
-- normalized update: `W*_j = W0_j(1+delta*G_j)/sum_k W0_k(1+delta*G_k)`
-
-The pairwise weight ratio changes whenever criterion pressures differ, so the revised rule is non-degenerate by construction.
-
-## What the ablation shows
-
-In the reconstructed Marikana case, most of the numerical change comes from **criterion-specific relevance itself**, not from the contention modifier:
-
-- maximum absolute full revision change from base at the primary delta=0.3 specification: about 0.02215;
-- maximum incremental effect of SIC versus equal stakeholder groups: about 0.000286;
-- maximum incremental effect of adding contention versus SIC-only: about 0.000397.
-
-Therefore the contention term should be described as an optional dynamic modifier, not as the principal demonstrated empirical innovation in this case.
-
-## What the semantic sensitivity audit adds
-
-The preregistered primary criterion lexicon produced a strong Local Employment upweighting. A post-hoc semantic audit then removed generic `labour`, `workers`, and `wages` language from Local Employment and separately broadened financial terminology.
-
-That audit found:
-
-- the strong Local Employment upweighting is **not semantically robust**; under strict employment semantics it returns approximately to the base weight;
-- Community Infrastructure remains upweighted under the tested semantic variants;
-- broadening financial semantics can restore NPV approximately to or slightly above its base weight.
-
-This means the empirical contribution should **not** be framed as a definitive new set of Marikana investment weights. The architecture is mathematically sound, but documentary criterion-weight estimates depend on how criterion relevance is operationalized and require stronger measurement validation.
+- normalized criterion update: `W*_j = W0_j(1+delta*G_j)/sum_k W0_k(1+delta*G_k)`
 
 ## Defensible candidate contribution
 
 A cautious contribution statement is:
 
-> The revised framework introduces an auditable criterion-specific propagation layer that prevents stakeholder salience from cancelling during normalization and permits documentary criterion relevance, structural salience, and optional contention signals to influence relative mineral-policy criterion weights transparently.
+> The revised framework couples structural stakeholder salience, empirically observed stakeholder contention, and criterion-specific issue relevance from a frozen governance corpus to produce transparent, non-degenerate criterion-weight updates in mineral-policy MCDA.
 
-The current evidence supports novelty primarily in the **specific non-degenerate propagation architecture plus reproducibility/sensitivity discipline**, not in any single numerical revised weight.
+The targeted literature search conducted during reconstruction identified prior work on each neighboring component—stakeholder-specific MCDA, text-derived criterion weighting, sentiment-assisted MCDM, and dynamic stakeholder salience—but did not identify an obvious implementation of this exact three-factor propagation architecture in mineral-policy convergence.
 
-The targeted literature search conducted during reconstruction identified prior work on neighboring components—stakeholder-specific MCDA, text-derived criterion weighting, sentiment-assisted MCDM, and dynamic stakeholder salience—but did not establish that this exact architecture is absent from all prior literature.
-
-This is a **candidate methodological gap**, not an absolute priority claim.
+This supports a **candidate methodological gap**, not an absolute priority claim.
 
 ## Language recommended for a manuscript
 
 Prefer:
 
-> "Building on stakeholder-salience, text-analytics and multi-actor MCDA literatures, this study introduces a criterion-specific propagation mechanism that avoids scalar-normalization cancellation and evaluates documentary issue relevance under explicit sensitivity analysis."
+> "Building on stakeholder-salience, text-analytics and multi-actor MCDA literatures, this study introduces a criterion-specific propagation mechanism that jointly incorporates stakeholder salience, observed contention and documentary issue relevance."
 
-If a later structured literature search supports it, cautiously consider:
+Or, after a fuller systematic search:
 
-> "To our knowledge, prior mineral-policy MCDA frameworks have not combined criterion-specific documentary relevance with stakeholder salience in a normalized weighting rule designed explicitly to avoid common-scalar cancellation."
+> "To our knowledge, prior mineral-policy MCDA frameworks have not operationalized stakeholder salience, observed discourse contention and criterion-specific documentary relevance within a single normalized dynamic-weighting rule."
 
 Avoid:
 
@@ -107,22 +77,19 @@ Avoid:
 - "the first NLP-MCDM framework"
 - "the first dynamic stakeholder weighting model"
 - "the first use of text mining to derive MCDA weights"
-- claims that contention is the main empirical driver in the Marikana case
-- claims that the primary Local Employment weight is semantically stable
 
-Those claims are not supported by the current evidence.
+Those broader claims are not supportable.
 
 ## Separate empirical contribution
 
-The stance result is independent of the corrected-model novelty. The static robustness audit shows that, on the independently reconstructed frozen corpus, the historical pro-integration-dominant conclusion does not reproduce under either computational reading, the final adjudicated ledger, or 35 alternative adjudication settings. This remains the strongest empirical reproducibility finding.
+The stance result is independent of the corrected-model novelty. The static robustness audit shows that, on the independently reconstructed frozen corpus, the historical pro-integration-dominant conclusion does not reproduce under either computational reading, the final adjudicated ledger, or 35 alternative adjudication settings. This can be presented as an empirical reproducibility/robustness contribution even if the corrected SWDC formulation is ultimately treated as future methodological development.
 
 ## Remaining literature task before submission
 
-Before using `to our knowledge` language, conduct a structured search across at least Scopus/Web of Science/Google Scholar using combinations of:
+Before using `to our knowledge` language in a manuscript, conduct a structured search across at least Scopus/Web of Science/Google Scholar using combinations of:
 
 - stakeholder salience + MCDA/MCDM/AHP
 - stakeholder-specific/dynamic weights + mining/mineral policy
-- criterion relevance + stakeholder documents/statements + MCDA
 - issue salience/contention + MCDA
 - sentiment/text mining + dynamic criterion weights
 - multi-actor MCDA + unstructured text

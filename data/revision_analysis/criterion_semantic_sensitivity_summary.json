@@ -1,0 +1,103 @@
+{
+  "employment_strict_local_employment_change_from_base": -0.0009270606976581053,
+  "finance_broad_IRR_change_from_base": -0.004023322342543961,
+  "finance_broad_NPV_change_from_base": 0.001397895624153489,
+  "finance_broad_strict_local_employment_change_from_base": -0.0021757590030640483,
+  "fresh_recovered_total": 774,
+  "interpretation_constraint": "These post-hoc variants test semantic dependence. They must be reported as sensitivity analyses, not substituted retroactively for the preregistered primary rule based on which result is preferred.",
+  "max_abs_weight_difference_primary_vs_employment_strict": 0.023070625867196298,
+  "max_abs_weight_difference_primary_vs_finance_broad_strict": 0.02431932417260224,
+  "recovered_by_stakeholder": {
+    "NGO": 32,
+    "community": 33,
+    "government": 318,
+    "investor": 147,
+    "labour": 244
+  },
+  "rule": {
+    "min_distinct_families": 2,
+    "min_matched_sentences": 2
+  },
+  "stage": "post_hoc_criterion_semantic_sensitivity",
+  "status": "sensitivity_only_does_not_replace_preregistered_primary",
+  "variants": {
+    "employment_strict": {
+      "changes_from_base": {
+        "Community Infrastructure": 0.012209038336736242,
+        "Geological Feasibility": -0.0015611004730410605,
+        "IRR": -0.003591094963664082,
+        "Local Employment": -0.0009270606976581053,
+        "Market Stability": -0.00242732274941751,
+        "NPV": -0.0037024594529554977
+      },
+      "criterion_pressure": {
+        "Community Infrastructure": 0.48758842705636657,
+        "Geological Feasibility": 0.03640960180519497,
+        "IRR": 0.01070681847480857,
+        "Local Employment": 0.05080307319646886,
+        "Market Stability": 0.016745306223773477,
+        "NPV": 0.02141828438395139
+      },
+      "revised_weights": {
+        "Community Infrastructure": 0.11220903833673625,
+        "Geological Feasibility": 0.14843889952695893,
+        "IRR": 0.19640890503633593,
+        "Local Employment": 0.1490729393023419,
+        "Market Stability": 0.14757267725058248,
+        "NPV": 0.2462975405470445
+      }
+    },
+    "finance_broad_employment_strict": {
+      "changes_from_base": {
+        "Community Infrastructure": 0.011269127735402104,
+        "Geological Feasibility": -0.0028044877917797473,
+        "IRR": -0.004023322342543961,
+        "Local Employment": -0.0021757590030640483,
+        "Market Stability": -0.0036634542221677946,
+        "NPV": 0.001397895624153489
+      },
+      "criterion_pressure": {
+        "Community Infrastructure": 0.48758842705636657,
+        "Geological Feasibility": 0.03640960180519497,
+        "IRR": 0.03153330771253241,
+        "Local Employment": 0.05080307319646886,
+        "Market Stability": 0.016745306223773477,
+        "NPV": 0.11981385836837653
+      },
+      "revised_weights": {
+        "Community Infrastructure": 0.11126912773540211,
+        "Geological Feasibility": 0.14719551220822025,
+        "IRR": 0.19597667765745605,
+        "Local Employment": 0.14782424099693595,
+        "Market Stability": 0.1463365457778322,
+        "NPV": 0.2513978956241535
+      }
+    },
+    "primary_preregistered": {
+      "changes_from_base": {
+        "Community Infrastructure": 0.00916678846368335,
+        "Geological Feasibility": -0.005585626749496614,
+        "IRR": -0.008916200456682344,
+        "Local Employment": 0.022143565169538193,
+        "Market Stability": -0.006428363710880541,
+        "NPV": -0.01038016271616199
+      },
+      "criterion_pressure": {
+        "Community Infrastructure": 0.48758842705636657,
+        "Geological Feasibility": 0.03640960180519497,
+        "IRR": 0.01070681847480857,
+        "Local Employment": 0.6834383321392938,
+        "Market Stability": 0.016745306223773477,
+        "NPV": 0.02141828438395139
+      },
+      "revised_weights": {
+        "Community Infrastructure": 0.10916678846368336,
+        "Geological Feasibility": 0.14441437325050338,
+        "IRR": 0.19108379954331767,
+        "Local Employment": 0.1721435651695382,
+        "Market Stability": 0.14357163628911945,
+        "NPV": 0.239619837283838
+      }
+    }
+  }
+}

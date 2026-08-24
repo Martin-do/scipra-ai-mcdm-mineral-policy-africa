@@ -1,16 +1,16 @@
 stakeholder_group,criterion,recovered_documents,relevant_documents,A_sj
-government,NPV,319,0,0.0
-government,IRR,319,0,0.0
-government,Geological Feasibility,319,0,0.0
-government,Market Stability,319,0,0.0
-government,Local Employment,319,169,0.5297805642633229
-government,Community Infrastructure,319,90,0.28213166144200624
-investor,NPV,147,13,0.08843537414965986
-investor,IRR,147,3,0.02040816326530612
-investor,Geological Feasibility,147,9,0.061224489795918366
-investor,Market Stability,147,9,0.061224489795918366
-investor,Local Employment,147,118,0.8027210884353742
-investor,Community Infrastructure,147,111,0.7551020408163265
+government,NPV,320,0,0.0
+government,IRR,320,0,0.0
+government,Geological Feasibility,320,0,0.0
+government,Market Stability,320,0,0.0
+government,Local Employment,320,170,0.53125
+government,Community Infrastructure,320,91,0.284375
+investor,NPV,146,12,0.0821917808219178
+investor,IRR,146,3,0.02054794520547945
+investor,Geological Feasibility,146,8,0.0547945205479452
+investor,Market Stability,146,8,0.0547945205479452
+investor,Local Employment,146,117,0.8013698630136986
+investor,Community Infrastructure,146,110,0.7534246575342466
 community,NPV,33,0,0.0
 community,IRR,33,0,0.0
 community,Geological Feasibility,33,0,0.0

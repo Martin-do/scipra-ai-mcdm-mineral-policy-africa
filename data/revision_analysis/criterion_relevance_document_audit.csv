@@ -17,12 +17,6 @@ CORP-003,investor,IRR,15,2,3325,true,true,true,true
 CORP-003,investor,Local Employment,275,8,3325,true,true,true,true
 CORP-003,investor,Market Stability,32,4,3325,true,true,true,true
 CORP-003,investor,NPV,90,4,3325,true,true,true,true
-CORP-004,investor,Community Infrastructure,37,7,3090,true,true,true,true
-CORP-004,investor,Geological Feasibility,8,2,3090,true,true,true,true
-CORP-004,investor,IRR,10,1,3090,true,true,false,false
-CORP-004,investor,Local Employment,44,4,3090,true,true,true,true
-CORP-004,investor,Market Stability,12,2,3090,true,true,true,true
-CORP-004,investor,NPV,104,4,3090,true,true,true,true
 CORP-006,investor,Community Infrastructure,4,3,893,true,true,true,true
 CORP-006,investor,Geological Feasibility,3,2,893,true,true,true,true
 CORP-006,investor,IRR,0,0,893,false,false,false,false
@@ -2891,6 +2885,12 @@ GOV-SAT-001,government,IRR,0,0,26,false,false,false,false
 GOV-SAT-001,government,Local Employment,0,0,26,false,false,false,false
 GOV-SAT-001,government,Market Stability,0,0,26,false,false,false,false
 GOV-SAT-001,government,NPV,0,0,26,false,false,false,false
+INST-001,government,Community Infrastructure,137,7,4673,true,true,true,true
+INST-001,government,Geological Feasibility,13,1,4673,true,true,false,false
+INST-001,government,IRR,0,0,4673,false,false,false,false
+INST-001,government,Local Employment,285,7,4673,true,true,true,true
+INST-001,government,Market Stability,0,0,4673,false,false,false,false
+INST-001,government,NPV,0,0,4673,false,false,false,false
 INST-002,NGO,Community Infrastructure,198,10,1974,true,true,true,true
 INST-002,NGO,Geological Feasibility,10,4,1974,true,true,true,true
 INST-002,NGO,IRR,0,0,1974,false,false,false,false
