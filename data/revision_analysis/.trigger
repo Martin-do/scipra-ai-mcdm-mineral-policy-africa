@@ -1,1 +1,1 @@
-2026-08-24T15:04+01:00 run PR3 static stance robustness and corrected SWDC verification
+2026-08-24T15:20+01:00 derive preregistered criterion relevance matrix and revised SWDC weights
