@@ -6,16 +6,10 @@ on:
     paths:
       - 'code/analyze_stance_robustness.py'
       - 'code/audit_corrected_swdc_candidate.py'
+      - 'code/derive_criterion_relevance_matrix.py'
       - '.github/workflows/run-robustness-swdc-revision.yml'
       - 'data/revision_analysis/.trigger'
-  pull_request:
-    branches: [post-freeze-analysis]
-    types: [opened, synchronize, reopened]
-    paths:
-      - 'code/analyze_stance_robustness.py'
-      - 'code/audit_corrected_swdc_candidate.py'
-      - '.github/workflows/run-robustness-swdc-revision.yml'
-      - 'data/revision_analysis/.trigger'
+      - 'data/revision_analysis/CRITERION_RELEVANCE_PROTOCOL.md'
   workflow_dispatch:
 
 permissions:
@@ -24,6 +18,7 @@ permissions:
 jobs:
   audit:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,11 +28,19 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install criterion-relevance dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests trafilatura beautifulsoup4 pypdf pymupdf
+
       - name: Run static stance robustness audit
         run: python code/analyze_stance_robustness.py
 
-      - name: Run corrected SWDC candidate audit
+      - name: Run corrected SWDC candidate mathematical audit
         run: python code/audit_corrected_swdc_candidate.py
+
+      - name: Derive preregistered criterion-relevance matrix
+        run: python code/derive_criterion_relevance_matrix.py
 
       - name: Assert revision boundary and outputs
         run: |
@@ -47,6 +50,7 @@ jobs:
           p=Path('data/revision_analysis')
           stance=json.loads((p/'stance_robustness_summary.json').read_text())
           swdc=json.loads((p/'corrected_swdc_candidate_summary.json').read_text())
+          rel=json.loads((p/'criterion_relevance_summary.json').read_text())
           assert stance['frozen_analysis_ready_records']==876
           assert stance['pass1']['resistant']==672 and stance['pass1']['pro_integration']==63
           assert stance['final_reconstructed_ledger']['resistant']==730 and stance['final_reconstructed_ledger']['pro_integration']==77
@@ -54,21 +58,33 @@ jobs:
           assert swdc['original_structural_result']=='degenerate_common_scalar_cancels_exactly'
           assert swdc['candidate_properties_verified']['nontrivial_relative_reweighting_if_criterion_pressures_differ'] is True
           assert swdc['illustrative_matrix_status']=='illustrative_not_empirical_not_for_substantive_policy_claims'
-          print(json.dumps({'stance':stance,'swdc':swdc}, indent=2))
+          assert rel['eligible_resolved_stakeholder_records']==776
+          assert rel['historical_parameter_recovery_claim'] is False
+          assert rel['revision_claim'] is True
+          print(json.dumps({'stance':stance,'swdc_candidate':swdc,'criterion_relevance':rel}, indent=2))
           PY
 
       - name: Publish revision-audit outputs
-        if: github.event_name == 'push'
         shell: bash
         run: |
           set -euo pipefail
+          STAGE="$RUNNER_TEMP/revision_outputs"
+          mkdir -p "$STAGE"
+          cp data/revision_analysis/* "$STAGE/" 2>/dev/null || true
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/revision_analysis/
-          if ! git diff --cached --quiet; then
-            git commit -m 'Publish stance robustness and corrected SWDC candidate audit'
-            git push origin HEAD:robustness-swdc-revision
-          fi
+          for attempt in 1 2 3; do
+            git fetch origin robustness-swdc-revision
+            git reset --hard origin/robustness-swdc-revision
+            mkdir -p data/revision_analysis
+            cp "$STAGE"/* data/revision_analysis/ 2>/dev/null || true
+            git add data/revision_analysis/
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'Publish robustness and data-derived SWDC revision audit'
+            if git push origin HEAD:robustness-swdc-revision; then exit 0; fi
+            sleep $((attempt*3))
+          done
+          exit 1
 
       - name: Upload revision audit artifact
         uses: actions/upload-artifact@v4
