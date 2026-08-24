@@ -1,10 +1,22 @@
-# Deterministic membership freeze; this edit also triggers the first workflow run.
+# Deterministic membership freeze with observable same-repo PR execution.
 name: Finalize SCIPRA reconstructed corpus freeze
 
 on:
   push:
     branches:
       - dataset-reconstruction
+    paths:
+      - '.github/workflows/finalize-scipra-corpus-freeze.yml'
+      - 'data/reconstruction/finalize_textwide_near_duplicate_review.py'
+      - 'data/reconstruction/prefreeze_manifest_after_broad_duplicate_review.csv'
+      - 'data/reconstruction/textwide_near_duplicate_candidates.csv'
+      - 'data/reconstruction/textwide_recovery_status.csv'
+      - 'data/reconstruction/review_handoff/screened_qc_preliminary_unique_text_manifest.csv'
+      - 'data/reconstruction/media_substantive_decision_summary.json'
+      - 'data/reconstruction/secondary_media_substantive_decision_summary.json'
+  pull_request:
+    branches: [main]
+    types: [synchronize, reopened]
     paths:
       - '.github/workflows/finalize-scipra-corpus-freeze.yml'
       - 'data/reconstruction/finalize_textwide_near_duplicate_review.py'
@@ -47,6 +59,7 @@ jobs:
           cat data/reconstruction/corpus_freeze_hashes.json
 
       - name: Publish frozen corpus outputs safely
+        if: github.event_name != 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
