@@ -1,0 +1,12 @@
+name: Archived — archive media pair finalizer
+
+on:
+  workflow_dispatch:
+
+jobs:
+  archived:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo 'Archive pair review is complete and incorporated into the frozen SCIPRA corpus.'
+          echo 'This workflow is retained for provenance and no longer mutates the reconstruction branch.'

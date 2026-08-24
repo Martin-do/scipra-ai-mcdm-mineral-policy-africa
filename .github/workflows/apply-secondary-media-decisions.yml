@@ -1,0 +1,68 @@
+# Acquired-text secondary media decision workflow.
+name: Apply secondary media decisions
+
+on:
+  push:
+    branches:
+      - dataset-reconstruction
+    paths:
+      - '.github/workflows/apply-secondary-media-decisions.yml'
+      - 'data/reconstruction/apply_secondary_media_decision_batch_01.py'
+      - 'data/reconstruction/apply_secondary_media_decision_batch_02.py'
+      - 'data/reconstruction/apply_secondary_media_decision_batch_03.py'
+      - 'data/reconstruction/build_secondary_media_review_queue.py'
+      - 'data/reconstruction/export_secondary_pending_compact.py'
+      - 'data/reconstruction/secondary_media_targeted_evidence.csv'
+  workflow_dispatch:
+
+concurrency:
+  group: scipra-secondary-media-decisions
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  decide:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout reconstruction branch
+        uses: actions/checkout@v4
+        with:
+          ref: dataset-reconstruction
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Rebuild conservative secondary Batch 01
+        run: python data/reconstruction/apply_secondary_media_decision_batch_01.py
+
+      - name: Apply temporal labour secondary Batch 02
+        run: python data/reconstruction/apply_secondary_media_decision_batch_02.py
+
+      - name: Export compact final pending groups before final decisions
+        run: python data/reconstruction/export_secondary_pending_compact.py
+
+      - name: Apply explicit final secondary Batch 03
+        run: python data/reconstruction/apply_secondary_media_decision_batch_03.py
+
+      - name: Build final pending-only evidence review queue
+        run: python data/reconstruction/build_secondary_media_review_queue.py
+
+      - name: Show secondary decision summaries
+        run: |
+          cat data/reconstruction/secondary_media_substantive_decision_summary.json
+          cat data/reconstruction/secondary_media_substantive_review_queue_summary.json
+
+      - name: Publish completed secondary ledger and audit files
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/reconstruction/secondary_media_substantive_decision_ledger.csv data/reconstruction/secondary_media_substantive_decision_summary.json data/reconstruction/secondary_media_substantive_review_queue.csv data/reconstruction/secondary_media_substantive_review_queue_summary.json data/reconstruction/secondary_pending_strong_case_compact.csv data/reconstruction/secondary_pending_strong_case_compact.json data/reconstruction/secondary_pending_possible_lonmin_compact.csv data/reconstruction/secondary_pending_possible_lonmin_compact.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish completed secondary media substantive decisions'
+            git pull --rebase origin dataset-reconstruction
+            git push origin HEAD:dataset-reconstruction
+          fi

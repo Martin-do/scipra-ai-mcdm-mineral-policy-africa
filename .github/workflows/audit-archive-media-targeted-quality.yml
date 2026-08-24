@@ -1,0 +1,13 @@
+name: Archived — targeted archive media quality audit
+
+on:
+  workflow_dispatch:
+
+jobs:
+  archived:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo 'SCIPRA corpus membership is frozen.'
+          echo 'This workflow no longer runs automatically.'
+          echo 'Committed quality-audit scripts and results remain the reconstruction provenance.'

@@ -1,0 +1,80 @@
+# Dedicated final textwide audit. Publication preserves generated metadata-only
+# outputs across concurrent branch updates instead of rebasing generated files.
+name: Audit SCIPRA textwide near duplicates
+
+on:
+  push:
+    branches:
+      - dataset-reconstruction
+    paths:
+      - '.github/workflows/audit-textwide-near-duplicates.yml'
+      - 'data/reconstruction/audit_textwide_near_duplicates.py'
+      - 'data/reconstruction/prefreeze_manifest_after_broad_duplicate_review.csv'
+  workflow_dispatch:
+
+concurrency:
+  group: scipra-textwide-near-duplicate-audit
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout reconstruction branch
+        uses: actions/checkout@v4
+        with:
+          ref: dataset-reconstruction
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install extraction and similarity dependencies
+        run: pip install requests beautifulsoup4 trafilatura pypdf scikit-learn==1.4.2
+
+      - name: Run final textwide near-duplicate evidence audit
+        run: python data/reconstruction/audit_textwide_near_duplicates.py
+
+      - name: Show textwide audit summary
+        run: cat data/reconstruction/textwide_near_duplicate_summary.json
+
+      - name: Publish metadata-only textwide audit safely
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUTDIR="/tmp/scipra-textwide-output"
+          rm -rf "$OUTDIR"
+          mkdir -p "$OUTDIR"
+          cp data/reconstruction/textwide_recovery_status.csv "$OUTDIR/"
+          cp data/reconstruction/textwide_near_duplicate_candidates.csv "$OUTDIR/"
+          cp data/reconstruction/textwide_near_duplicate_summary.json "$OUTDIR/"
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          for attempt in 1 2 3 4; do
+            echo "Publish attempt $attempt"
+            git fetch origin dataset-reconstruction
+            git reset --hard origin/dataset-reconstruction
+            cp "$OUTDIR/textwide_recovery_status.csv" data/reconstruction/
+            cp "$OUTDIR/textwide_near_duplicate_candidates.csv" data/reconstruction/
+            cp "$OUTDIR/textwide_near_duplicate_summary.json" data/reconstruction/
+            git add data/reconstruction/textwide_recovery_status.csv data/reconstruction/textwide_near_duplicate_candidates.csv data/reconstruction/textwide_near_duplicate_summary.json
+            if git diff --cached --quiet; then
+              echo "Textwide outputs already published."
+              exit 0
+            fi
+            git commit -m 'Publish SCIPRA textwide near-duplicate evidence'
+            if git push origin HEAD:dataset-reconstruction; then
+              exit 0
+            fi
+            echo "Concurrent update detected; retrying from latest branch."
+            sleep $((attempt * 2))
+          done
+          echo "Unable to publish textwide outputs after four attempts." >&2
+          exit 1

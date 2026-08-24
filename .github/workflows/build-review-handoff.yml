@@ -1,0 +1,90 @@
+name: Build SCIPRA frozen corpus audit handoff
+
+on:
+  push:
+    branches:
+      - dataset-reconstruction
+    paths:
+      - '.github/workflows/build-review-handoff.yml'
+      - 'data/reconstruction/build_frozen_review_handoff.py'
+      - 'data/reconstruction/corpus_freeze_summary.json'
+      - 'data/reconstruction/corpus_freeze_hashes.json'
+      - 'data/reconstruction/canonical_reconstructed_replication_corpus.csv'
+      - 'data/reconstruction/canonical_analysis_ready_manifest.csv'
+  pull_request:
+    branches: [main]
+    types: [synchronize, reopened]
+    paths:
+      - '.github/workflows/build-review-handoff.yml'
+      - 'data/reconstruction/build_frozen_review_handoff.py'
+  workflow_dispatch:
+
+concurrency:
+  group: scipra-frozen-review-handoff-${{ github.event_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dataset branch
+        uses: actions/checkout@v4
+        with:
+          ref: dataset-reconstruction
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build frozen reviewer handoff and ZIP
+        run: python data/reconstruction/build_frozen_review_handoff.py
+
+      - name: Show handoff summary
+        run: cat data/reconstruction/review_handoff/HANDOFF_SUMMARY.json
+
+      - name: Publish frozen audit handoff safely
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUTDIR="/tmp/scipra-handoff-output"
+          rm -rf "$OUTDIR"
+          mkdir -p "$OUTDIR"
+          cp -a data/reconstruction/review_handoff "$OUTDIR/review_handoff"
+          cp data/reconstruction/scipra_corpus_freeze_handoff.zip "$OUTDIR/"
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          for attempt in 1 2 3 4; do
+            git fetch origin dataset-reconstruction
+            git reset --hard origin/dataset-reconstruction
+            rm -rf data/reconstruction/review_handoff
+            cp -a "$OUTDIR/review_handoff" data/reconstruction/review_handoff
+            cp "$OUTDIR/scipra_corpus_freeze_handoff.zip" data/reconstruction/scipra_corpus_freeze_handoff.zip
+            rm -f data/reconstruction/scipra_external_review_handoff.zip
+            git add -A data/reconstruction/review_handoff data/reconstruction/scipra_corpus_freeze_handoff.zip data/reconstruction/scipra_external_review_handoff.zip
+            if git diff --cached --quiet; then
+              echo "Frozen handoff already published."
+              exit 0
+            fi
+            git commit -m 'Publish SCIPRA frozen corpus audit handoff'
+            if git push origin HEAD:dataset-reconstruction; then
+              exit 0
+            fi
+            sleep $((attempt * 2))
+          done
+          exit 1
+
+      - name: Upload frozen handoff artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: scipra-frozen-corpus-audit-handoff
+          path: |
+            data/reconstruction/review_handoff/
+            data/reconstruction/scipra_corpus_freeze_handoff.zip
+          retention-days: 30

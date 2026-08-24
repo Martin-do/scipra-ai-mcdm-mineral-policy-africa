@@ -1,0 +1,95 @@
+name: Package SCIPRA verification files
+
+on:
+  push:
+    branches:
+      - dataset-reconstruction
+    paths:
+      - '.github/workflows/package-verification-files.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout reconstruction branch
+        uses: actions/checkout@v4
+        with:
+          ref: dataset-reconstruction
+
+      - name: Build independent-verification bundle
+        run: |
+          set -euo pipefail
+          OUT="data/reconstruction/verification_bundle"
+          ZIP="data/reconstruction/scipra_verification_files.zip"
+          rm -rf "$OUT" "$ZIP"
+          mkdir -p "$OUT/discovery"
+
+          cp data/reconstruction/source_family_status.csv "$OUT/"
+          cp data/reconstruction/expanded_media_candidates_discovery_direct.csv "$OUT/"
+          cp data/reconstruction/discovery/media_discovery_prescreen_summary.json "$OUT/discovery/"
+          cp data/reconstruction/acquisition_summary_latest.json "$OUT/"
+          cp data/reconstruction/acquisition_status_latest.csv "$OUT/"
+          cp data/reconstruction/prescreen_media_discovery.py "$OUT/"
+          cp data/reconstruction/triage_media_substantive_screen.py "$OUT/"
+          cp .github/workflows/acquire-corpus.yml "$OUT/"
+
+          if [ -f data/reconstruction/media_substantive_screen_triage.csv ]; then
+            cp data/reconstruction/media_substantive_screen_triage.csv "$OUT/"
+          fi
+          if [ -f data/reconstruction/media_substantive_screen_triage_summary.json ]; then
+            cp data/reconstruction/media_substantive_screen_triage_summary.json "$OUT/"
+          fi
+
+          {
+            echo "SCIPRA independent-verification bundle"
+            echo "Source branch: dataset-reconstruction"
+            echo "Packaged from commit: $(git rev-parse HEAD)"
+            echo
+            echo "Purpose: verify the current acquisition/extraction and archive-prescreen claims without relying on narrative summaries."
+            echo
+            echo "Key checks:"
+            echo "- source_family_status.csv: 2,076 discovery total and media screening status"
+            echo "- expanded_media_candidates_discovery_direct.csv: complete 690 title-trigger review queue"
+            echo "- discovery/media_discovery_prescreen_summary.json: 432 explicit-case + 258 Lonmin-only split"
+            echo "- acquisition_summary_latest.json: 1,056 processed / 1,045 fully extracted summary"
+            echo "- acquisition_status_latest.csv: row-level acquisition evidence"
+            echo "- prescreen_media_discovery.py: exact title/URL prescreen logic"
+            echo "- triage_media_substantive_screen.py: non-decisional acquired-text triage logic"
+            echo
+            echo "Row counts (including header for CSV files):"
+            for f in "$OUT"/*.csv "$OUT"/discovery/*.csv; do
+              [ -e "$f" ] || continue
+              printf '%s: ' "$(basename "$f")"
+              wc -l < "$f"
+            done
+            echo
+            echo "SHA-256 checksums:"
+            find "$OUT" -type f ! -name VERIFICATION_MANIFEST.txt -print0 | sort -z | xargs -0 sha256sum
+          } > "$OUT/VERIFICATION_MANIFEST.txt"
+
+          cd data/reconstruction
+          zip -qr scipra_verification_files.zip verification_bundle
+
+      - name: Publish verification ZIP
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/reconstruction/scipra_verification_files.zip
+          if ! git diff --cached --quiet; then
+            git commit -m 'Package SCIPRA independent verification files'
+            git pull --rebase origin dataset-reconstruction
+            git push origin HEAD:dataset-reconstruction
+          fi
+
+      - name: Upload verification artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: scipra-verification-files
+          path: |
+            data/reconstruction/verification_bundle/
+            data/reconstruction/scipra_verification_files.zip
+          retention-days: 30

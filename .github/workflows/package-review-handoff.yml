@@ -1,0 +1,68 @@
+name: Package SCIPRA external review handoff
+
+on:
+  push:
+    branches:
+      - dataset-reconstruction
+    paths:
+      - '.github/workflows/package-review-handoff.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dataset reconstruction branch
+        uses: actions/checkout@v4
+        with:
+          ref: dataset-reconstruction
+
+      - name: Build complete external-review ZIP
+        run: |
+          set -e
+          ROOT="$GITHUB_WORKSPACE/data/reconstruction"
+          STAGE="$(mktemp -d)"
+          cp -r "$ROOT/review_handoff" "$STAGE/review_handoff"
+          mkdir -p "$STAGE/review_handoff/latest_full_acquisition_audit"
+
+          cp "$ROOT/acquisition_summary_latest.json" "$STAGE/review_handoff/latest_full_acquisition_audit/" 2>/dev/null || true
+          cp "$ROOT/acquisition_status_latest.csv" "$STAGE/review_handoff/latest_full_acquisition_audit/" 2>/dev/null || true
+          if [ -d "$ROOT/qc" ]; then
+            cp -r "$ROOT/qc" "$STAGE/review_handoff/latest_full_acquisition_audit/qc"
+          fi
+
+          cat > "$STAGE/review_handoff/latest_full_acquisition_audit/README.md" <<'EOF'
+          # Latest full acquisition audit
+
+          This subfolder is deliberately separate from the screened preliminary corpus in the parent folder.
+
+          The parent handoff contains the current screened reconstruction snapshot used for external corpus review. The files here record the later, broader acquisition/QC pass, including archive-discovered candidates that have not all been accepted as corpus members.
+
+          The latest recorded audit processed 1,056 candidates, of which 1,045 were acquired/extracted. These are acquisition/QC counts, **not a final corpus size**. Substantive eligibility screening, duplicate/mirror resolution, acquisition/text-quality review, final inclusion/exclusion decisions and corpus freeze are still required before annotation or modelling.
+          EOF
+
+          rm -f "$ROOT/scipra_external_review_handoff.zip"
+          cd "$STAGE"
+          zip -qr "$ROOT/scipra_external_review_handoff.zip" review_handoff
+          ls -lh "$ROOT/scipra_external_review_handoff.zip"
+
+      - name: Publish ZIP to dataset branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/reconstruction/scipra_external_review_handoff.zip
+          if ! git diff --cached --quiet; then
+            git commit -m 'Package complete SCIPRA external review handoff ZIP'
+            git pull --rebase origin dataset-reconstruction
+            git push origin HEAD:dataset-reconstruction
+          fi
+
+      - name: Upload ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: scipra-external-review-handoff-zip
+          path: data/reconstruction/scipra_external_review_handoff.zip
+          retention-days: 30

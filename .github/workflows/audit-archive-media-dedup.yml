@@ -1,0 +1,13 @@
+name: Archived — archive media dedup audit
+
+on:
+  workflow_dispatch:
+
+jobs:
+  archived:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo 'SCIPRA corpus membership is frozen.'
+          echo 'This workflow is retained as a historical marker only.'
+          echo 'Use the committed audit scripts/results if the reconstruction is deliberately reopened.'

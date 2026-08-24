@@ -1,0 +1,103 @@
+name: Acquire reconstructed corpus
+
+on:
+  push:
+    branches:
+      - dataset-reconstruction
+    paths:
+      - '.github/workflows/acquire-corpus.yml'
+      - 'data/reconstruction/acquire_corpus.py'
+      - 'data/reconstruction/acquire_corpus_v2.py'
+      - 'data/reconstruction/acquire_corpus_v3.py'
+      - 'data/reconstruction/acquire_corpus_v4.py'
+      - 'data/reconstruction/qc_corpus.py'
+      - 'data/reconstruction/triage_media_substantive_screen.py'
+      - 'data/reconstruction/derive_media_screening_evidence.py'
+      - 'data/reconstruction/MEDIA_SUBSTANTIVE_SCREENING_RUBRIC.md'
+      - 'data/reconstruction/source_overrides.csv'
+      - 'data/reconstruction/candidate_corpus_87.csv'
+      - 'data/reconstruction/retrieval_manifest.csv'
+      - 'data/reconstruction/institutional_replacement_candidates.csv'
+      - 'data/reconstruction/expanded_*_candidates*.csv'
+  workflow_dispatch:
+
+concurrency:
+  group: scipra-dataset-acquisition
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout dataset branch
+        uses: actions/checkout@v4
+        with:
+          ref: dataset-reconstruction
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install acquisition and QC dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 pypdf trafilatura cryptography pymupdf pytesseract pillow scikit-learn==1.4.2
+
+      - name: Acquire and extract candidate corpus
+        run: python data/reconstruction/acquire_corpus_v4.py
+
+      - name: Triage archive media for substantive review
+        run: python data/reconstruction/triage_media_substantive_screen.py
+
+      - name: Derive acquired-text screening evidence
+        run: python data/reconstruction/derive_media_screening_evidence.py
+
+      - name: Run preliminary corpus QC
+        run: python data/reconstruction/qc_corpus.py
+
+      - name: Show acquisition, triage, screening evidence and QC summary
+        if: always()
+        run: |
+          cat acquisition_output/summary.json || true
+          cat data/reconstruction/media_substantive_screen_triage_summary.json || true
+          cat data/reconstruction/media_screening_evidence_summary.json || true
+          cat acquisition_output/qc/summary.json || true
+
+      - name: Publish acquisition, triage, screening evidence and QC status to branch
+        if: always()
+        run: |
+          if [ -f acquisition_output/acquisition_status.csv ]; then
+            cp acquisition_output/acquisition_status.csv data/reconstruction/acquisition_status_latest.csv
+          fi
+          if [ -f acquisition_output/summary.json ]; then
+            cp acquisition_output/summary.json data/reconstruction/acquisition_summary_latest.json
+          fi
+          if [ -d acquisition_output/qc ]; then
+            mkdir -p data/reconstruction/qc
+            cp acquisition_output/qc/* data/reconstruction/qc/
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/reconstruction/acquisition_status_latest.csv data/reconstruction/acquisition_summary_latest.json data/reconstruction/qc data/reconstruction/media_substantive_screen_triage.csv data/reconstruction/media_substantive_screen_triage_summary.json data/reconstruction/media_screening_evidence.csv data/reconstruction/media_screening_evidence_summary.json || true
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record latest corpus acquisition, screening evidence and QC audit'
+            git pull --rebase origin dataset-reconstruction
+            git push origin HEAD:dataset-reconstruction
+          fi
+
+      - name: Upload acquisition audit artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scipra-corpus-acquisition
+          path: acquisition_output/
+          if-no-files-found: warn
+          retention-days: 30
