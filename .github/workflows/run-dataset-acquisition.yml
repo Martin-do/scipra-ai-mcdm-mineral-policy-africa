@@ -1,0 +1,13 @@
+name: Archived — dataset acquisition and preliminary review handoff
+
+on:
+  workflow_dispatch:
+
+jobs:
+  archived:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo 'The dataset-first reconstruction has reached a hash-locked corpus freeze.'
+          echo 'Automatic acquisition/review-handoff rebuilding is retired on this branch.'
+          echo 'Historical acquisition scripts and outputs remain available in data/reconstruction.'
