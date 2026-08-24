@@ -44,11 +44,9 @@ EXPECTED_DUPLICATE_PAIRS = {
     ("DISC-MEDIA-0431", "DISC-MEDIA-0392"),
 }
 
+# Latest stable textwide rerun recovered all four previously blocked gov.za pages.
+# Only these four PDF/annual-report records still need provenance reconciliation.
 EXPECTED_RECOVERY_GAPS = {
-    "EXP-GOV-011",
-    "GOV-SAT-001",
-    "WEB-GOV-001",
-    "WEB-GOV-004",
     "CORP-001",
     "CORP-003",
     "expanded_corporate_candidates__EXP-CORP-002",
@@ -117,8 +115,8 @@ unusable = {r["record_id"] for r in recovery if not truthy(r.get("usable_for_tex
 if unusable != EXPECTED_RECOVERY_GAPS:
     raise RuntimeError(f"Unexpected textwide recovery-gap set: {sorted(unusable)}")
 status_counts = Counter(r.get("fetch_status", "") for r in recovery)
-if status_counts.get("fetch_failed", 0) != 4 or status_counts.get("retrieved_no_text", 0) != 4:
-    raise RuntimeError(f"Expected 4 fetch_failed + 4 retrieved_no_text; saw {dict(status_counts)}")
+if status_counts.get("retrieved_extracted", 0) != 879 or status_counts.get("retrieved_no_text", 0) != 4 or status_counts.get("fetch_failed", 0) != 0:
+    raise RuntimeError(f"Expected 879 extracted + 4 no-text + 0 failed; saw {dict(status_counts)}")
 
 if title_summary.get("records_in_ledger") != 690 or title_summary.get("final_decisions_made") != 690:
     raise RuntimeError("Title-trigger media ledger is not complete at 690/690")
@@ -149,7 +147,7 @@ for r in prefreeze:
     if y < 2010 or y > 2023:
         raise RuntimeError(f"Retained record outside 2010-2023: {r.get('canonical_record_id')} ({y})")
 
-# ---- Reconcile the eight live-site failures to previously validated text -----
+# ---- Reconcile the four current live-site extraction gaps --------------------
 prior_by_id = {r.get("candidate_id", ""): r for r in prior}
 recovery_by_id = {r["record_id"]: r for r in recovery}
 reconciliation_rows = []
@@ -173,7 +171,7 @@ for rid in sorted(EXPECTED_RECOVERY_GAPS):
         "prior_validated_text_words": wc,
         "reconciliation_decision": "retain_analysis_ready",
         "reconciliation_status": "fresh_recovery_reconciled_prior_validated_text",
-        "reconciliation_reason": "Current live retrieval failed or yielded insufficient text, but a prior reviewed extraction with a non-empty SHA-256 and >=80 words is preserved in the reconstruction provenance.",
+        "reconciliation_reason": "Current live retrieval yielded insufficient text, but a prior reviewed extraction with a non-empty SHA-256 and >=80 words is preserved in the reconstruction provenance.",
     })
 
 recon_fields = [
@@ -284,8 +282,9 @@ summary = {
         "review_complete": True,
     },
     "fresh_recovery_reconciliation": {
-        "current_live_recovery_gaps": 8,
-        "reconciled_to_prior_validated_extractions": 8,
+        "current_live_recovery_gaps": 4,
+        "reconciled_to_prior_validated_extractions": 4,
+        "freshly_recovered_analysis_ready_records": 879,
         "unreconciled": 0,
     },
     "eiti_provenance_caveat": EITI_CAVEAT,
