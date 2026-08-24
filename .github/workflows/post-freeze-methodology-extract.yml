@@ -33,6 +33,8 @@ jobs:
           python-version: '3.11'
       - name: Extract methodology paragraphs
         run: python code/post_freeze_extract_methodology.py
+      - name: Show exact B.4 annotation block
+        run: cat data/post_freeze_analysis/annotation_protocol_excerpt.txt
       - name: Publish extracts on push only
         if: github.event_name != 'pull_request'
         shell: bash
