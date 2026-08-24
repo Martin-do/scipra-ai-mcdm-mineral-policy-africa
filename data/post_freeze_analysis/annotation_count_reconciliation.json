@@ -1,0 +1,13 @@
+{
+  "counts_are_disjoint_only_within_the_explicit_partition_above": true,
+  "full_frozen_partition": "687 + 48 + 138 + 3 unavailable = 876",
+  "labeled_but_in_stakeholder_review_queue": 48,
+  "labeled_not_in_review_queue": 687,
+  "recovered_text_partition": "687 labeled/no-review + 48 labeled/stakeholder-review + 138 unlabeled/stance-review = 873",
+  "review_queue_partition": "48 labeled/stakeholder-review + 138 unlabeled/stance-review + 3 unavailable = 189",
+  "text_unavailable_records_in_review_queue": 3,
+  "total_frozen_records": 876,
+  "total_recovered_records": 873,
+  "total_review_queue_records": 189,
+  "unlabeled_recovered_records_in_stance_review_queue": 138
+}
