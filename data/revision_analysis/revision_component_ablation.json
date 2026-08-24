@@ -1,9 +1,9 @@
 {
   "delta": 0.3,
   "interpretation": "In the reconstructed Marikana case, criterion-specific documentary relevance drives most of the weight shift. SIC produces only a small additional redistribution across stakeholder groups, and reconstructed contention adds very little beyond SIC because resistance/contention is high across most stakeholder groups. The contention term is therefore a valid dynamic component of the architecture but not the main empirical driver in this case.",
-  "maximum_absolute_full_revision_change_from_base": 0.022160043783637534,
-  "maximum_absolute_increment_from_SIC_over_equal_actor_groups": 0.00028761170182994844,
-  "maximum_absolute_increment_from_contention_over_SIC_only": 0.00039886806249844753,
+  "maximum_absolute_full_revision_change_from_base": 0.0217708994329239,
+  "maximum_absolute_increment_from_SIC_over_equal_actor_groups": 0.000275041498250278,
+  "maximum_absolute_increment_from_contention_over_SIC_only": 0.0003645485446932689,
   "novelty_implication": "Do not attribute the observed revised weights primarily to sentiment/contention. The demonstrated methodological advance is the non-degenerate criterion-specific propagation architecture; contention is an optional empirically weak modifier for this case and should be tested across additional cases before being promoted as a core contribution.",
   "stage": "revised_SCIPRA_component_ablation",
   "weights_by_mode": {
@@ -16,36 +16,36 @@
       "NPV": 0.25
     },
     "criterion_relevance_SIC_only": {
-      "Community Infrastructure": 0.1096015561595986,
-      "Geological Feasibility": 0.14428349476027108,
-      "IRR": 0.19098399596980012,
-      "Local Employment": 0.17204854837590092,
-      "Market Stability": 0.14350388967294414,
-      "NPV": 0.2395785150614852
+      "Community Infrastructure": 0.10915589264368374,
+      "Geological Feasibility": 0.14449599826718973,
+      "IRR": 0.1911780287819798,
+      "Local Employment": 0.17162072331531622,
+      "Market Stability": 0.14371530119901896,
+      "NPV": 0.2398340557928116
     },
     "criterion_relevance_SIC_times_contention": {
-      "Community Infrastructure": 0.10920268809710015,
-      "Geological Feasibility": 0.14439065494844455,
-      "IRR": 0.19111641475894386,
-      "Local Employment": 0.17216004378363753,
-      "Market Stability": 0.14354778019469563,
-      "NPV": 0.23958241821717838
+      "Community Infrastructure": 0.10879134409899047,
+      "Geological Feasibility": 0.1445822532451518,
+      "IRR": 0.19129767771136164,
+      "Local Employment": 0.1717708994329239,
+      "Market Stability": 0.14373824918069225,
+      "NPV": 0.23981957633087983
     },
     "criterion_relevance_document_volume": {
-      "Community Infrastructure": 0.10859272195097953,
-      "Geological Feasibility": 0.14368551154181985,
-      "IRR": 0.19099037054345552,
-      "Local Employment": 0.17379139866933946,
-      "Market Stability": 0.14346414472470573,
-      "NPV": 0.23947585256969978
+      "Community Infrastructure": 0.10805962339838422,
+      "Geological Feasibility": 0.14392585071726224,
+      "IRR": 0.19122840894226395,
+      "Local Employment": 0.17330152422122697,
+      "Market Stability": 0.14370160893478923,
+      "NPV": 0.2397829837860733
     },
     "criterion_relevance_equal_actor_groups": {
-      "Community Infrastructure": 0.10942599024203643,
-      "Geological Feasibility": 0.1444241649692121,
-      "IRR": 0.19110282849193905,
-      "Local Employment": 0.17176093667407097,
-      "Market Stability": 0.14358551817287485,
-      "NPV": 0.23970056144986665
+      "Community Infrastructure": 0.10899441897288961,
+      "Geological Feasibility": 0.1446300707126676,
+      "IRR": 0.19129107899290063,
+      "Local Employment": 0.17134568181706594,
+      "Market Stability": 0.14379032323071778,
+      "NPV": 0.23994842627375834
     }
   }
 }

@@ -3,14 +3,14 @@ primary_preregistered,government,NPV,318,0,0.0
 primary_preregistered,government,IRR,318,0,0.0
 primary_preregistered,government,Geological Feasibility,318,0,0.0
 primary_preregistered,government,Market Stability,318,0,0.0
-primary_preregistered,government,Local Employment,318,169,0.5314465408805031
+primary_preregistered,government,Local Employment,318,168,0.5283018867924528
 primary_preregistered,government,Community Infrastructure,318,89,0.279874213836478
-primary_preregistered,investor,NPV,147,13,0.08843537414965986
-primary_preregistered,investor,IRR,147,3,0.02040816326530612
-primary_preregistered,investor,Geological Feasibility,147,9,0.061224489795918366
-primary_preregistered,investor,Market Stability,147,9,0.061224489795918366
-primary_preregistered,investor,Local Employment,147,118,0.8027210884353742
-primary_preregistered,investor,Community Infrastructure,147,111,0.7551020408163265
+primary_preregistered,investor,NPV,146,12,0.0821917808219178
+primary_preregistered,investor,IRR,146,2,0.0136986301369863
+primary_preregistered,investor,Geological Feasibility,146,8,0.0547945205479452
+primary_preregistered,investor,Market Stability,146,8,0.0547945205479452
+primary_preregistered,investor,Local Employment,146,117,0.8013698630136986
+primary_preregistered,investor,Community Infrastructure,146,110,0.7534246575342466
 primary_preregistered,community,NPV,33,0,0.0
 primary_preregistered,community,IRR,33,0,0.0
 primary_preregistered,community,Geological Feasibility,33,0,0.0
@@ -35,12 +35,12 @@ employment_strict,government,Geological Feasibility,318,0,0.0
 employment_strict,government,Market Stability,318,0,0.0
 employment_strict,government,Local Employment,318,0,0.0
 employment_strict,government,Community Infrastructure,318,89,0.279874213836478
-employment_strict,investor,NPV,147,13,0.08843537414965986
-employment_strict,investor,IRR,147,3,0.02040816326530612
-employment_strict,investor,Geological Feasibility,147,9,0.061224489795918366
-employment_strict,investor,Market Stability,147,9,0.061224489795918366
-employment_strict,investor,Local Employment,147,11,0.07482993197278912
-employment_strict,investor,Community Infrastructure,147,111,0.7551020408163265
+employment_strict,investor,NPV,146,12,0.0821917808219178
+employment_strict,investor,IRR,146,2,0.0136986301369863
+employment_strict,investor,Geological Feasibility,146,8,0.0547945205479452
+employment_strict,investor,Market Stability,146,8,0.0547945205479452
+employment_strict,investor,Local Employment,146,10,0.0684931506849315
+employment_strict,investor,Community Infrastructure,146,110,0.7534246575342466
 employment_strict,community,NPV,33,0,0.0
 employment_strict,community,IRR,33,0,0.0
 employment_strict,community,Geological Feasibility,33,0,0.0
@@ -65,12 +65,12 @@ finance_broad_employment_strict,government,Geological Feasibility,318,0,0.0
 finance_broad_employment_strict,government,Market Stability,318,0,0.0
 finance_broad_employment_strict,government,Local Employment,318,0,0.0
 finance_broad_employment_strict,government,Community Infrastructure,318,89,0.279874213836478
-finance_broad_employment_strict,investor,NPV,147,39,0.2653061224489796
-finance_broad_employment_strict,investor,IRR,147,13,0.08843537414965986
-finance_broad_employment_strict,investor,Geological Feasibility,147,9,0.061224489795918366
-finance_broad_employment_strict,investor,Market Stability,147,9,0.061224489795918366
-finance_broad_employment_strict,investor,Local Employment,147,11,0.07482993197278912
-finance_broad_employment_strict,investor,Community Infrastructure,147,111,0.7551020408163265
+finance_broad_employment_strict,investor,NPV,146,38,0.2602739726027397
+finance_broad_employment_strict,investor,IRR,146,12,0.0821917808219178
+finance_broad_employment_strict,investor,Geological Feasibility,146,8,0.0547945205479452
+finance_broad_employment_strict,investor,Market Stability,146,8,0.0547945205479452
+finance_broad_employment_strict,investor,Local Employment,146,10,0.0684931506849315
+finance_broad_employment_strict,investor,Community Infrastructure,146,110,0.7534246575342466
 finance_broad_employment_strict,community,NPV,33,3,0.09090909090909091
 finance_broad_employment_strict,community,IRR,33,0,0.0
 finance_broad_employment_strict,community,Geological Feasibility,33,0,0.0
