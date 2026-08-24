@@ -29,7 +29,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: scipra-corpus-freeze-finalizer
+  group: scipra-corpus-freeze-finalizer-${{ github.event_name }}
   cancel-in-progress: true
 
 permissions:
