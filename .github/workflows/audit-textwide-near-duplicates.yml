@@ -1,3 +1,4 @@
+# Triggered after first creation so GitHub Actions observes the workflow on this branch.
 name: Audit SCIPRA textwide near duplicates
 
 on:
