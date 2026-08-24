@@ -2039,12 +2039,12 @@ DISC-MEDIA-0365,investor,IRR,0,0,15,false,false,false,false
 DISC-MEDIA-0365,investor,Local Employment,6,3,15,true,true,true,true
 DISC-MEDIA-0365,investor,Market Stability,0,0,15,false,false,false,false
 DISC-MEDIA-0365,investor,NPV,0,0,15,false,false,false,false
-DISC-MEDIA-0368,investor,Community Infrastructure,0,0,1,false,false,false,false
-DISC-MEDIA-0368,investor,Geological Feasibility,0,0,1,false,false,false,false
-DISC-MEDIA-0368,investor,IRR,0,0,1,false,false,false,false
-DISC-MEDIA-0368,investor,Local Employment,0,0,1,false,false,false,false
-DISC-MEDIA-0368,investor,Market Stability,0,0,1,false,false,false,false
-DISC-MEDIA-0368,investor,NPV,0,0,1,false,false,false,false
+DISC-MEDIA-0368,investor,Community Infrastructure,2,3,10,true,true,true,false
+DISC-MEDIA-0368,investor,Geological Feasibility,0,0,10,false,false,false,false
+DISC-MEDIA-0368,investor,IRR,0,0,10,false,false,false,false
+DISC-MEDIA-0368,investor,Local Employment,3,3,10,true,true,true,true
+DISC-MEDIA-0368,investor,Market Stability,0,0,10,false,false,false,false
+DISC-MEDIA-0368,investor,NPV,0,0,10,false,false,false,false
 DISC-MEDIA-0369,investor,Community Infrastructure,2,3,27,true,true,true,false
 DISC-MEDIA-0369,investor,Geological Feasibility,0,0,27,false,false,false,false
 DISC-MEDIA-0369,investor,IRR,0,0,27,false,false,false,false
@@ -2057,6 +2057,12 @@ DISC-MEDIA-0371,labour,IRR,0,0,17,false,false,false,false
 DISC-MEDIA-0371,labour,Local Employment,3,3,17,true,true,true,true
 DISC-MEDIA-0371,labour,Market Stability,0,0,17,false,false,false,false
 DISC-MEDIA-0371,labour,NPV,0,0,17,false,false,false,false
+DISC-MEDIA-0372,labour,Community Infrastructure,2,3,16,true,true,true,false
+DISC-MEDIA-0372,labour,Geological Feasibility,0,0,16,false,false,false,false
+DISC-MEDIA-0372,labour,IRR,0,0,16,false,false,false,false
+DISC-MEDIA-0372,labour,Local Employment,1,2,16,true,false,false,false
+DISC-MEDIA-0372,labour,Market Stability,0,0,16,false,false,false,false
+DISC-MEDIA-0372,labour,NPV,0,0,16,false,false,false,false
 DISC-MEDIA-0374,investor,Community Infrastructure,10,6,18,true,true,true,true
 DISC-MEDIA-0374,investor,Geological Feasibility,0,0,18,false,false,false,false
 DISC-MEDIA-0374,investor,IRR,0,0,18,false,false,false,false
@@ -2069,12 +2075,12 @@ DISC-MEDIA-0376,government,IRR,0,0,15,false,false,false,false
 DISC-MEDIA-0376,government,Local Employment,0,0,15,false,false,false,false
 DISC-MEDIA-0376,government,Market Stability,0,0,15,false,false,false,false
 DISC-MEDIA-0376,government,NPV,0,0,15,false,false,false,false
-DISC-MEDIA-0381,investor,Community Infrastructure,0,0,1,false,false,false,false
-DISC-MEDIA-0381,investor,Geological Feasibility,0,0,1,false,false,false,false
-DISC-MEDIA-0381,investor,IRR,0,0,1,false,false,false,false
-DISC-MEDIA-0381,investor,Local Employment,0,0,1,false,false,false,false
-DISC-MEDIA-0381,investor,Market Stability,0,0,1,false,false,false,false
-DISC-MEDIA-0381,investor,NPV,0,0,1,false,false,false,false
+DISC-MEDIA-0381,investor,Community Infrastructure,16,5,43,true,true,true,true
+DISC-MEDIA-0381,investor,Geological Feasibility,7,1,43,true,true,false,false
+DISC-MEDIA-0381,investor,IRR,0,0,43,false,false,false,false
+DISC-MEDIA-0381,investor,Local Employment,5,4,43,true,true,true,true
+DISC-MEDIA-0381,investor,Market Stability,0,0,43,false,false,false,false
+DISC-MEDIA-0381,investor,NPV,0,0,43,false,false,false,false
 DISC-MEDIA-0383,investor,Community Infrastructure,2,3,25,true,true,true,false
 DISC-MEDIA-0383,investor,Geological Feasibility,0,0,25,false,false,false,false
 DISC-MEDIA-0383,investor,IRR,0,0,25,false,false,false,false
@@ -2129,12 +2135,12 @@ DISC-MEDIA-0399,government,IRR,0,0,28,false,false,false,false
 DISC-MEDIA-0399,government,Local Employment,6,2,28,true,true,true,true
 DISC-MEDIA-0399,government,Market Stability,0,0,28,false,false,false,false
 DISC-MEDIA-0399,government,NPV,0,0,28,false,false,false,false
-DISC-MEDIA-0401,labour,Community Infrastructure,0,0,1,false,false,false,false
-DISC-MEDIA-0401,labour,Geological Feasibility,0,0,1,false,false,false,false
-DISC-MEDIA-0401,labour,IRR,0,0,1,false,false,false,false
-DISC-MEDIA-0401,labour,Local Employment,0,0,1,false,false,false,false
-DISC-MEDIA-0401,labour,Market Stability,0,0,1,false,false,false,false
-DISC-MEDIA-0401,labour,NPV,0,0,1,false,false,false,false
+DISC-MEDIA-0401,labour,Community Infrastructure,2,3,16,true,true,true,false
+DISC-MEDIA-0401,labour,Geological Feasibility,0,0,16,false,false,false,false
+DISC-MEDIA-0401,labour,IRR,0,0,16,false,false,false,false
+DISC-MEDIA-0401,labour,Local Employment,3,2,16,true,true,true,true
+DISC-MEDIA-0401,labour,Market Stability,0,0,16,false,false,false,false
+DISC-MEDIA-0401,labour,NPV,0,0,16,false,false,false,false
 DISC-MEDIA-0404,government,Community Infrastructure,2,3,23,true,true,true,false
 DISC-MEDIA-0404,government,Geological Feasibility,0,0,23,false,false,false,false
 DISC-MEDIA-0404,government,IRR,0,0,23,false,false,false,false
@@ -2303,12 +2309,12 @@ DISC-MEDIA-0531,labour,IRR,0,0,11,false,false,false,false
 DISC-MEDIA-0531,labour,Local Employment,7,6,11,true,true,true,true
 DISC-MEDIA-0531,labour,Market Stability,1,1,11,true,false,false,false
 DISC-MEDIA-0531,labour,NPV,0,0,11,false,false,false,false
-DISC-MEDIA-0533,investor,Community Infrastructure,0,0,1,false,false,false,false
-DISC-MEDIA-0533,investor,Geological Feasibility,0,0,1,false,false,false,false
-DISC-MEDIA-0533,investor,IRR,0,0,1,false,false,false,false
-DISC-MEDIA-0533,investor,Local Employment,0,0,1,false,false,false,false
-DISC-MEDIA-0533,investor,Market Stability,0,0,1,false,false,false,false
-DISC-MEDIA-0533,investor,NPV,0,0,1,false,false,false,false
+DISC-MEDIA-0533,investor,Community Infrastructure,2,3,16,true,true,true,false
+DISC-MEDIA-0533,investor,Geological Feasibility,0,0,16,false,false,false,false
+DISC-MEDIA-0533,investor,IRR,0,0,16,false,false,false,false
+DISC-MEDIA-0533,investor,Local Employment,5,3,16,true,true,true,true
+DISC-MEDIA-0533,investor,Market Stability,1,1,16,true,false,false,false
+DISC-MEDIA-0533,investor,NPV,0,0,16,false,false,false,false
 DISC-MEDIA-0548,investor,Community Infrastructure,2,3,47,true,true,true,false
 DISC-MEDIA-0548,investor,Geological Feasibility,2,1,47,true,true,false,false
 DISC-MEDIA-0548,investor,IRR,0,0,47,false,false,false,false
@@ -2387,6 +2393,18 @@ DISC-MEDIA-0574,investor,IRR,0,0,26,false,false,false,false
 DISC-MEDIA-0574,investor,Local Employment,0,0,26,false,false,false,false
 DISC-MEDIA-0574,investor,Market Stability,0,0,26,false,false,false,false
 DISC-MEDIA-0574,investor,NPV,0,0,26,false,false,false,false
+DISC-MEDIA-0576,government,Community Infrastructure,2,3,29,true,true,true,false
+DISC-MEDIA-0576,government,Geological Feasibility,0,0,29,false,false,false,false
+DISC-MEDIA-0576,government,IRR,0,0,29,false,false,false,false
+DISC-MEDIA-0576,government,Local Employment,6,2,29,true,true,true,true
+DISC-MEDIA-0576,government,Market Stability,0,0,29,false,false,false,false
+DISC-MEDIA-0576,government,NPV,0,0,29,false,false,false,false
+DISC-MEDIA-0577,government,Community Infrastructure,3,4,38,true,true,true,true
+DISC-MEDIA-0577,government,Geological Feasibility,0,0,38,false,false,false,false
+DISC-MEDIA-0577,government,IRR,0,0,38,false,false,false,false
+DISC-MEDIA-0577,government,Local Employment,5,2,38,true,true,true,true
+DISC-MEDIA-0577,government,Market Stability,0,0,38,false,false,false,false
+DISC-MEDIA-0577,government,NPV,0,0,38,false,false,false,false
 DISC-MEDIA-0583,investor,Community Infrastructure,2,3,42,true,true,true,false
 DISC-MEDIA-0583,investor,Geological Feasibility,0,0,42,false,false,false,false
 DISC-MEDIA-0583,investor,IRR,0,0,42,false,false,false,false
@@ -2423,12 +2441,24 @@ DISC-MEDIA-0598,government,IRR,0,0,18,false,false,false,false
 DISC-MEDIA-0598,government,Local Employment,2,2,18,true,true,true,false
 DISC-MEDIA-0598,government,Market Stability,0,0,18,false,false,false,false
 DISC-MEDIA-0598,government,NPV,0,0,18,false,false,false,false
-DISC-MEDIA-0599,government,Community Infrastructure,0,0,1,false,false,false,false
-DISC-MEDIA-0599,government,Geological Feasibility,0,0,1,false,false,false,false
-DISC-MEDIA-0599,government,IRR,0,0,1,false,false,false,false
-DISC-MEDIA-0599,government,Local Employment,0,0,1,false,false,false,false
-DISC-MEDIA-0599,government,Market Stability,0,0,1,false,false,false,false
-DISC-MEDIA-0599,government,NPV,0,0,1,false,false,false,false
+DISC-MEDIA-0599,government,Community Infrastructure,2,3,29,true,true,true,false
+DISC-MEDIA-0599,government,Geological Feasibility,0,0,29,false,false,false,false
+DISC-MEDIA-0599,government,IRR,0,0,29,false,false,false,false
+DISC-MEDIA-0599,government,Local Employment,1,1,29,true,false,false,false
+DISC-MEDIA-0599,government,Market Stability,0,0,29,false,false,false,false
+DISC-MEDIA-0599,government,NPV,0,0,29,false,false,false,false
+DISC-MEDIA-0601,investor,Community Infrastructure,2,3,22,true,true,true,false
+DISC-MEDIA-0601,investor,Geological Feasibility,0,0,22,false,false,false,false
+DISC-MEDIA-0601,investor,IRR,0,0,22,false,false,false,false
+DISC-MEDIA-0601,investor,Local Employment,1,1,22,true,false,false,false
+DISC-MEDIA-0601,investor,Market Stability,0,0,22,false,false,false,false
+DISC-MEDIA-0601,investor,NPV,0,0,22,false,false,false,false
+DISC-MEDIA-0606,labour,Community Infrastructure,2,3,35,true,true,true,false
+DISC-MEDIA-0606,labour,Geological Feasibility,0,0,35,false,false,false,false
+DISC-MEDIA-0606,labour,IRR,0,0,35,false,false,false,false
+DISC-MEDIA-0606,labour,Local Employment,10,2,35,true,true,true,true
+DISC-MEDIA-0606,labour,Market Stability,0,0,35,false,false,false,false
+DISC-MEDIA-0606,labour,NPV,0,0,35,false,false,false,false
 DISC-MEDIA-0608,government,Community Infrastructure,2,3,34,true,true,true,false
 DISC-MEDIA-0608,government,Geological Feasibility,0,0,34,false,false,false,false
 DISC-MEDIA-0608,government,IRR,0,0,34,false,false,false,false
@@ -2465,12 +2495,12 @@ DISC-MEDIA-0627,labour,IRR,0,0,14,false,false,false,false
 DISC-MEDIA-0627,labour,Local Employment,6,6,14,true,true,true,true
 DISC-MEDIA-0627,labour,Market Stability,0,0,14,false,false,false,false
 DISC-MEDIA-0627,labour,NPV,0,0,14,false,false,false,false
-DISC-MEDIA-0628,government,Community Infrastructure,0,0,1,false,false,false,false
-DISC-MEDIA-0628,government,Geological Feasibility,0,0,1,false,false,false,false
-DISC-MEDIA-0628,government,IRR,0,0,1,false,false,false,false
-DISC-MEDIA-0628,government,Local Employment,0,0,1,false,false,false,false
-DISC-MEDIA-0628,government,Market Stability,0,0,1,false,false,false,false
-DISC-MEDIA-0628,government,NPV,0,0,1,false,false,false,false
+DISC-MEDIA-0628,government,Community Infrastructure,4,4,10,true,true,true,true
+DISC-MEDIA-0628,government,Geological Feasibility,1,1,10,true,false,false,false
+DISC-MEDIA-0628,government,IRR,0,0,10,false,false,false,false
+DISC-MEDIA-0628,government,Local Employment,6,2,10,true,true,true,true
+DISC-MEDIA-0628,government,Market Stability,0,0,10,false,false,false,false
+DISC-MEDIA-0628,government,NPV,0,0,10,false,false,false,false
 DISC-MEDIA-0630,labour,Community Infrastructure,2,3,17,true,true,true,false
 DISC-MEDIA-0630,labour,Geological Feasibility,0,0,17,false,false,false,false
 DISC-MEDIA-0630,labour,IRR,0,0,17,false,false,false,false
@@ -2483,24 +2513,24 @@ DISC-MEDIA-0634,investor,IRR,0,0,23,false,false,false,false
 DISC-MEDIA-0634,investor,Local Employment,5,3,23,true,true,true,true
 DISC-MEDIA-0634,investor,Market Stability,1,1,23,true,false,false,false
 DISC-MEDIA-0634,investor,NPV,0,0,23,false,false,false,false
-DISC-MEDIA-0636,investor,Community Infrastructure,0,0,1,false,false,false,false
-DISC-MEDIA-0636,investor,Geological Feasibility,0,0,1,false,false,false,false
-DISC-MEDIA-0636,investor,IRR,0,0,1,false,false,false,false
-DISC-MEDIA-0636,investor,Local Employment,0,0,1,false,false,false,false
-DISC-MEDIA-0636,investor,Market Stability,0,0,1,false,false,false,false
-DISC-MEDIA-0636,investor,NPV,0,0,1,false,false,false,false
+DISC-MEDIA-0636,investor,Community Infrastructure,2,3,25,true,true,true,false
+DISC-MEDIA-0636,investor,Geological Feasibility,0,0,25,false,false,false,false
+DISC-MEDIA-0636,investor,IRR,1,1,25,true,false,false,false
+DISC-MEDIA-0636,investor,Local Employment,3,2,25,true,true,true,true
+DISC-MEDIA-0636,investor,Market Stability,0,0,25,false,false,false,false
+DISC-MEDIA-0636,investor,NPV,0,0,25,false,false,false,false
 DISC-MEDIA-0651,investor,Community Infrastructure,2,3,12,true,true,true,false
 DISC-MEDIA-0651,investor,Geological Feasibility,0,0,12,false,false,false,false
 DISC-MEDIA-0651,investor,IRR,0,0,12,false,false,false,false
 DISC-MEDIA-0651,investor,Local Employment,3,2,12,true,true,true,true
 DISC-MEDIA-0651,investor,Market Stability,1,1,12,true,false,false,false
 DISC-MEDIA-0651,investor,NPV,0,0,12,false,false,false,false
-DISC-MEDIA-0654,investor,Community Infrastructure,0,0,1,false,false,false,false
-DISC-MEDIA-0654,investor,Geological Feasibility,0,0,1,false,false,false,false
-DISC-MEDIA-0654,investor,IRR,0,0,1,false,false,false,false
-DISC-MEDIA-0654,investor,Local Employment,0,0,1,false,false,false,false
-DISC-MEDIA-0654,investor,Market Stability,0,0,1,false,false,false,false
-DISC-MEDIA-0654,investor,NPV,0,0,1,false,false,false,false
+DISC-MEDIA-0654,investor,Community Infrastructure,2,3,19,true,true,true,false
+DISC-MEDIA-0654,investor,Geological Feasibility,0,0,19,false,false,false,false
+DISC-MEDIA-0654,investor,IRR,0,0,19,false,false,false,false
+DISC-MEDIA-0654,investor,Local Employment,7,4,19,true,true,true,true
+DISC-MEDIA-0654,investor,Market Stability,0,0,19,false,false,false,false
+DISC-MEDIA-0654,investor,NPV,0,0,19,false,false,false,false
 DISC-MEDIA-0655,labour,Community Infrastructure,2,3,34,true,true,true,false
 DISC-MEDIA-0655,labour,Geological Feasibility,1,1,34,true,false,false,false
 DISC-MEDIA-0655,labour,IRR,0,0,34,false,false,false,false
@@ -2531,6 +2561,12 @@ DISC-MEDIA-0667,investor,IRR,0,0,32,false,false,false,false
 DISC-MEDIA-0667,investor,Local Employment,3,2,32,true,true,true,true
 DISC-MEDIA-0667,investor,Market Stability,1,1,32,true,false,false,false
 DISC-MEDIA-0667,investor,NPV,0,0,32,false,false,false,false
+DISC-MEDIA-0677,investor,Community Infrastructure,4,4,15,true,true,true,true
+DISC-MEDIA-0677,investor,Geological Feasibility,0,0,15,false,false,false,false
+DISC-MEDIA-0677,investor,IRR,0,0,15,false,false,false,false
+DISC-MEDIA-0677,investor,Local Employment,5,5,15,true,true,true,true
+DISC-MEDIA-0677,investor,Market Stability,0,0,15,false,false,false,false
+DISC-MEDIA-0677,investor,NPV,0,0,15,false,false,false,false
 DISC-MEDIA-0687,labour,Community Infrastructure,2,3,7,true,true,true,false
 DISC-MEDIA-0687,labour,Geological Feasibility,0,0,7,false,false,false,false
 DISC-MEDIA-0687,labour,IRR,0,0,7,false,false,false,false
@@ -2567,6 +2603,12 @@ EXP-GOV-002,government,IRR,0,0,16,false,false,false,false
 EXP-GOV-002,government,Local Employment,1,1,16,true,false,false,false
 EXP-GOV-002,government,Market Stability,0,0,16,false,false,false,false
 EXP-GOV-002,government,NPV,0,0,16,false,false,false,false
+EXP-GOV-004,government,Community Infrastructure,12,6,43,true,true,true,true
+EXP-GOV-004,government,Geological Feasibility,3,1,43,true,true,false,false
+EXP-GOV-004,government,IRR,0,0,43,false,false,false,false
+EXP-GOV-004,government,Local Employment,11,4,43,true,true,true,true
+EXP-GOV-004,government,Market Stability,0,0,43,false,false,false,false
+EXP-GOV-004,government,NPV,0,0,43,false,false,false,false
 EXP-GOV-005,government,Community Infrastructure,4,2,48,true,true,true,true
 EXP-GOV-005,government,Geological Feasibility,0,0,48,false,false,false,false
 EXP-GOV-005,government,IRR,0,0,48,false,false,false,false
@@ -2837,12 +2879,6 @@ EXP-OFFICIAL-015,community,IRR,0,0,349,false,false,false,false
 EXP-OFFICIAL-015,community,Local Employment,7,3,349,true,true,true,true
 EXP-OFFICIAL-015,community,Market Stability,0,0,349,false,false,false,false
 EXP-OFFICIAL-015,community,NPV,0,0,349,false,false,false,false
-GOV-SAT-001,government,Community Infrastructure,1,1,26,true,false,false,false
-GOV-SAT-001,government,Geological Feasibility,0,0,26,false,false,false,false
-GOV-SAT-001,government,IRR,0,0,26,false,false,false,false
-GOV-SAT-001,government,Local Employment,0,0,26,false,false,false,false
-GOV-SAT-001,government,Market Stability,0,0,26,false,false,false,false
-GOV-SAT-001,government,NPV,0,0,26,false,false,false,false
 INST-001,government,Community Infrastructure,137,7,4673,true,true,true,true
 INST-001,government,Geological Feasibility,13,1,4673,true,true,false,false
 INST-001,government,IRR,0,0,4673,false,false,false,false
@@ -3677,6 +3713,12 @@ SEC-MEDIA-0117,labour,IRR,2,2,43,true,true,true,false
 SEC-MEDIA-0117,labour,Local Employment,20,5,43,true,true,true,true
 SEC-MEDIA-0117,labour,Market Stability,0,0,43,false,false,false,false
 SEC-MEDIA-0117,labour,NPV,0,0,43,false,false,false,false
+SEC-MEDIA-0125,investor,Community Infrastructure,2,3,31,true,true,true,false
+SEC-MEDIA-0125,investor,Geological Feasibility,0,0,31,false,false,false,false
+SEC-MEDIA-0125,investor,IRR,0,0,31,false,false,false,false
+SEC-MEDIA-0125,investor,Local Employment,3,4,31,true,true,true,true
+SEC-MEDIA-0125,investor,Market Stability,1,1,31,true,false,false,false
+SEC-MEDIA-0125,investor,NPV,1,1,31,true,false,false,false
 SEC-MEDIA-0150,labour,Community Infrastructure,2,3,18,true,true,true,false
 SEC-MEDIA-0150,labour,Geological Feasibility,0,0,18,false,false,false,false
 SEC-MEDIA-0150,labour,IRR,0,0,18,false,false,false,false
@@ -3719,12 +3761,12 @@ SEC-MEDIA-0196,labour,IRR,0,0,15,false,false,false,false
 SEC-MEDIA-0196,labour,Local Employment,1,1,15,true,false,false,false
 SEC-MEDIA-0196,labour,Market Stability,0,0,15,false,false,false,false
 SEC-MEDIA-0196,labour,NPV,0,0,15,false,false,false,false
-SEC-MEDIA-0197,labour,Community Infrastructure,0,0,1,false,false,false,false
-SEC-MEDIA-0197,labour,Geological Feasibility,0,0,1,false,false,false,false
-SEC-MEDIA-0197,labour,IRR,0,0,1,false,false,false,false
-SEC-MEDIA-0197,labour,Local Employment,0,0,1,false,false,false,false
-SEC-MEDIA-0197,labour,Market Stability,0,0,1,false,false,false,false
-SEC-MEDIA-0197,labour,NPV,0,0,1,false,false,false,false
+SEC-MEDIA-0197,labour,Community Infrastructure,2,3,10,true,true,true,false
+SEC-MEDIA-0197,labour,Geological Feasibility,0,0,10,false,false,false,false
+SEC-MEDIA-0197,labour,IRR,0,0,10,false,false,false,false
+SEC-MEDIA-0197,labour,Local Employment,3,3,10,true,true,true,true
+SEC-MEDIA-0197,labour,Market Stability,0,0,10,false,false,false,false
+SEC-MEDIA-0197,labour,NPV,0,0,10,false,false,false,false
 SEC-MEDIA-0198,labour,Community Infrastructure,2,3,11,true,true,true,false
 SEC-MEDIA-0198,labour,Geological Feasibility,0,0,11,false,false,false,false
 SEC-MEDIA-0198,labour,IRR,0,0,11,false,false,false,false
@@ -3791,12 +3833,12 @@ SEC-MEDIA-0239,labour,IRR,0,0,16,false,false,false,false
 SEC-MEDIA-0239,labour,Local Employment,11,4,16,true,true,true,true
 SEC-MEDIA-0239,labour,Market Stability,1,1,16,true,false,false,false
 SEC-MEDIA-0239,labour,NPV,0,0,16,false,false,false,false
-SEC-MEDIA-0251,labour,Community Infrastructure,0,0,1,false,false,false,false
-SEC-MEDIA-0251,labour,Geological Feasibility,0,0,1,false,false,false,false
-SEC-MEDIA-0251,labour,IRR,0,0,1,false,false,false,false
-SEC-MEDIA-0251,labour,Local Employment,0,0,1,false,false,false,false
-SEC-MEDIA-0251,labour,Market Stability,0,0,1,false,false,false,false
-SEC-MEDIA-0251,labour,NPV,0,0,1,false,false,false,false
+SEC-MEDIA-0251,labour,Community Infrastructure,2,3,30,true,true,true,false
+SEC-MEDIA-0251,labour,Geological Feasibility,0,0,30,false,false,false,false
+SEC-MEDIA-0251,labour,IRR,1,1,30,true,false,false,false
+SEC-MEDIA-0251,labour,Local Employment,14,5,30,true,true,true,true
+SEC-MEDIA-0251,labour,Market Stability,0,0,30,false,false,false,false
+SEC-MEDIA-0251,labour,NPV,0,0,30,false,false,false,false
 SEC-MEDIA-0254,labour,Community Infrastructure,2,3,25,true,true,true,false
 SEC-MEDIA-0254,labour,Geological Feasibility,1,1,25,true,false,false,false
 SEC-MEDIA-0254,labour,IRR,0,0,25,false,false,false,false
@@ -4025,12 +4067,12 @@ SEC-MEDIA-0559,investor,IRR,0,0,14,false,false,false,false
 SEC-MEDIA-0559,investor,Local Employment,0,0,14,false,false,false,false
 SEC-MEDIA-0559,investor,Market Stability,0,0,14,false,false,false,false
 SEC-MEDIA-0559,investor,NPV,0,0,14,false,false,false,false
-SEC-MEDIA-0577,investor,Community Infrastructure,0,0,1,false,false,false,false
-SEC-MEDIA-0577,investor,Geological Feasibility,0,0,1,false,false,false,false
-SEC-MEDIA-0577,investor,IRR,0,0,1,false,false,false,false
-SEC-MEDIA-0577,investor,Local Employment,0,0,1,false,false,false,false
-SEC-MEDIA-0577,investor,Market Stability,0,0,1,false,false,false,false
-SEC-MEDIA-0577,investor,NPV,0,0,1,false,false,false,false
+SEC-MEDIA-0577,investor,Community Infrastructure,2,3,8,true,true,true,false
+SEC-MEDIA-0577,investor,Geological Feasibility,0,0,8,false,false,false,false
+SEC-MEDIA-0577,investor,IRR,0,0,8,false,false,false,false
+SEC-MEDIA-0577,investor,Local Employment,5,4,8,true,true,true,true
+SEC-MEDIA-0577,investor,Market Stability,0,0,8,false,false,false,false
+SEC-MEDIA-0577,investor,NPV,0,0,8,false,false,false,false
 SEC-MEDIA-0622,investor,Community Infrastructure,3,4,23,true,true,true,true
 SEC-MEDIA-0622,investor,Geological Feasibility,0,0,23,false,false,false,false
 SEC-MEDIA-0622,investor,IRR,1,1,23,true,false,false,false
@@ -4043,30 +4085,30 @@ SEC-MEDIA-0706,investor,IRR,1,1,54,true,false,false,false
 SEC-MEDIA-0706,investor,Local Employment,4,5,54,true,true,true,true
 SEC-MEDIA-0706,investor,Market Stability,1,1,54,true,false,false,false
 SEC-MEDIA-0706,investor,NPV,6,2,54,true,true,true,true
-SEC-MEDIA-0764,investor,Community Infrastructure,0,0,1,false,false,false,false
-SEC-MEDIA-0764,investor,Geological Feasibility,0,0,1,false,false,false,false
-SEC-MEDIA-0764,investor,IRR,0,0,1,false,false,false,false
-SEC-MEDIA-0764,investor,Local Employment,0,0,1,false,false,false,false
-SEC-MEDIA-0764,investor,Market Stability,0,0,1,false,false,false,false
-SEC-MEDIA-0764,investor,NPV,0,0,1,false,false,false,false
+SEC-MEDIA-0764,investor,Community Infrastructure,2,3,61,true,true,true,false
+SEC-MEDIA-0764,investor,Geological Feasibility,0,0,61,false,false,false,false
+SEC-MEDIA-0764,investor,IRR,0,0,61,false,false,false,false
+SEC-MEDIA-0764,investor,Local Employment,1,1,61,true,false,false,false
+SEC-MEDIA-0764,investor,Market Stability,0,0,61,false,false,false,false
+SEC-MEDIA-0764,investor,NPV,2,2,61,true,true,true,false
 SEC-MEDIA-0877,investor,Community Infrastructure,2,3,19,true,true,true,false
 SEC-MEDIA-0877,investor,Geological Feasibility,0,0,19,false,false,false,false
 SEC-MEDIA-0877,investor,IRR,0,0,19,false,false,false,false
 SEC-MEDIA-0877,investor,Local Employment,3,2,19,true,true,true,true
 SEC-MEDIA-0877,investor,Market Stability,1,1,19,true,false,false,false
 SEC-MEDIA-0877,investor,NPV,0,0,19,false,false,false,false
-SEC-MEDIA-0928,investor,Community Infrastructure,0,0,1,false,false,false,false
-SEC-MEDIA-0928,investor,Geological Feasibility,0,0,1,false,false,false,false
-SEC-MEDIA-0928,investor,IRR,0,0,1,false,false,false,false
-SEC-MEDIA-0928,investor,Local Employment,0,0,1,false,false,false,false
-SEC-MEDIA-0928,investor,Market Stability,0,0,1,false,false,false,false
-SEC-MEDIA-0928,investor,NPV,0,0,1,false,false,false,false
-SEC-MEDIA-1013,labour,Community Infrastructure,0,0,1,false,false,false,false
-SEC-MEDIA-1013,labour,Geological Feasibility,0,0,1,false,false,false,false
-SEC-MEDIA-1013,labour,IRR,0,0,1,false,false,false,false
-SEC-MEDIA-1013,labour,Local Employment,0,0,1,false,false,false,false
-SEC-MEDIA-1013,labour,Market Stability,0,0,1,false,false,false,false
-SEC-MEDIA-1013,labour,NPV,0,0,1,false,false,false,false
+SEC-MEDIA-0928,investor,Community Infrastructure,2,3,42,true,true,true,false
+SEC-MEDIA-0928,investor,Geological Feasibility,0,0,42,false,false,false,false
+SEC-MEDIA-0928,investor,IRR,0,0,42,false,false,false,false
+SEC-MEDIA-0928,investor,Local Employment,4,5,42,true,true,true,true
+SEC-MEDIA-0928,investor,Market Stability,0,0,42,false,false,false,false
+SEC-MEDIA-0928,investor,NPV,3,1,42,true,true,false,false
+SEC-MEDIA-1013,labour,Community Infrastructure,3,3,15,true,true,true,true
+SEC-MEDIA-1013,labour,Geological Feasibility,0,0,15,false,false,false,false
+SEC-MEDIA-1013,labour,IRR,0,0,15,false,false,false,false
+SEC-MEDIA-1013,labour,Local Employment,6,4,15,true,true,true,true
+SEC-MEDIA-1013,labour,Market Stability,0,0,15,false,false,false,false
+SEC-MEDIA-1013,labour,NPV,0,0,15,false,false,false,false
 SEC-MEDIA-1017,investor,Community Infrastructure,2,3,18,true,true,true,false
 SEC-MEDIA-1017,investor,Geological Feasibility,0,0,18,false,false,false,false
 SEC-MEDIA-1017,investor,IRR,0,0,18,false,false,false,false
@@ -4109,6 +4151,12 @@ SERI-SAT2-004,NGO,IRR,0,0,25,false,false,false,false
 SERI-SAT2-004,NGO,Local Employment,1,1,25,true,false,false,false
 SERI-SAT2-004,NGO,Market Stability,0,0,25,false,false,false,false
 SERI-SAT2-004,NGO,NPV,0,0,25,false,false,false,false
+WEB-GOV-001,government,Community Infrastructure,0,0,11,false,false,false,false
+WEB-GOV-001,government,Geological Feasibility,0,0,11,false,false,false,false
+WEB-GOV-001,government,IRR,0,0,11,false,false,false,false
+WEB-GOV-001,government,Local Employment,2,2,11,true,true,true,false
+WEB-GOV-001,government,Market Stability,0,0,11,false,false,false,false
+WEB-GOV-001,government,NPV,0,0,11,false,false,false,false
 WEB-GOV-002,government,Community Infrastructure,7,3,40,true,true,true,true
 WEB-GOV-002,government,Geological Feasibility,1,1,40,true,false,false,false
 WEB-GOV-002,government,IRR,0,0,40,false,false,false,false
