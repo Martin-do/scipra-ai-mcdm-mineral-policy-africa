@@ -1,3 +1,4 @@
+# Registered workflow; deterministic and independent of annotation crawl.
 name: Audit SCIPRA post-freeze MCDM and index formulas
 
 on:
