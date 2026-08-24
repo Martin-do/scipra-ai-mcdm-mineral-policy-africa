@@ -11,6 +11,7 @@ on:
       - 'data/reconstruction/finalize_cross_phase_explicit_review.py'
       - 'data/reconstruction/build_broad_near_duplicate_candidates.py'
       - 'data/reconstruction/audit_broad_near_duplicate_text.py'
+      - 'data/reconstruction/finalize_broad_near_duplicate_review.py'
       - 'data/reconstruction/archive_media_same_title_year_similarity_audit.csv'
       - 'data/reconstruction/archive_media_quality_recovery_audit.csv'
       - 'data/reconstruction/archive_media_post_titlepair_manifest.csv'
@@ -26,6 +27,7 @@ on:
       - 'data/reconstruction/finalize_cross_phase_explicit_review.py'
       - 'data/reconstruction/build_broad_near_duplicate_candidates.py'
       - 'data/reconstruction/audit_broad_near_duplicate_text.py'
+      - 'data/reconstruction/finalize_broad_near_duplicate_review.py'
       - 'data/reconstruction/archive_media_same_title_year_similarity_audit.csv'
       - 'data/reconstruction/archive_media_quality_recovery_audit.csv'
       - 'data/reconstruction/archive_media_post_titlepair_manifest.csv'
@@ -73,6 +75,9 @@ jobs:
       - name: Fetch targeted text evidence for broad candidates
         run: python data/reconstruction/audit_broad_near_duplicate_text.py
 
+      - name: Finalize broad near-duplicate decisions
+        run: python data/reconstruction/finalize_broad_near_duplicate_review.py
+
       - name: Show review summaries
         run: |
           cat data/reconstruction/archive_media_post_titlepair_summary.json
@@ -84,14 +89,16 @@ jobs:
           cat data/reconstruction/broad_near_duplicate_candidate_summary.json
           echo
           cat data/reconstruction/broad_near_duplicate_text_evidence_summary.json
+          echo
+          cat data/reconstruction/broad_near_duplicate_final_summary.json
 
       - name: Publish duplicate review outputs
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/reconstruction/archive_media_quality_review_decisions.csv data/reconstruction/archive_media_same_title_year_decisions.csv data/reconstruction/archive_media_post_titlepair_manifest.csv data/reconstruction/archive_media_post_titlepair_summary.json data/reconstruction/cross_phase_match_audit.csv data/reconstruction/cross_phase_safe_duplicate_decisions.csv data/reconstruction/cross_phase_same_title_review.csv data/reconstruction/cross_phase_hash_collision_review.csv data/reconstruction/cross_phase_preliminary_combined_manifest.csv data/reconstruction/cross_phase_dedup_summary.json data/reconstruction/cross_phase_explicit_review_decisions.csv data/reconstruction/cross_phase_post_explicit_manifest.csv data/reconstruction/cross_phase_post_explicit_summary.json data/reconstruction/broad_near_duplicate_candidates.csv data/reconstruction/broad_near_duplicate_candidate_summary.json data/reconstruction/broad_near_duplicate_text_evidence.csv data/reconstruction/broad_near_duplicate_text_evidence_summary.json
+          git add data/reconstruction/archive_media_quality_review_decisions.csv data/reconstruction/archive_media_same_title_year_decisions.csv data/reconstruction/archive_media_post_titlepair_manifest.csv data/reconstruction/archive_media_post_titlepair_summary.json data/reconstruction/cross_phase_match_audit.csv data/reconstruction/cross_phase_safe_duplicate_decisions.csv data/reconstruction/cross_phase_same_title_review.csv data/reconstruction/cross_phase_hash_collision_review.csv data/reconstruction/cross_phase_preliminary_combined_manifest.csv data/reconstruction/cross_phase_dedup_summary.json data/reconstruction/cross_phase_explicit_review_decisions.csv data/reconstruction/cross_phase_post_explicit_manifest.csv data/reconstruction/cross_phase_post_explicit_summary.json data/reconstruction/broad_near_duplicate_candidates.csv data/reconstruction/broad_near_duplicate_candidate_summary.json data/reconstruction/broad_near_duplicate_text_evidence.csv data/reconstruction/broad_near_duplicate_text_evidence_summary.json data/reconstruction/broad_near_duplicate_final_decisions.csv data/reconstruction/prefreeze_manifest_after_broad_duplicate_review.csv data/reconstruction/broad_near_duplicate_final_summary.json
           if ! git diff --cached --quiet; then
-            git commit -m 'Publish targeted SCIPRA near-duplicate text evidence'
+            git commit -m 'Publish finalized SCIPRA broad duplicate review'
             git pull --rebase origin dataset-reconstruction
             git push origin HEAD:dataset-reconstruction
           fi
