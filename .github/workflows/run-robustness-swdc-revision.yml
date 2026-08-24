@@ -8,6 +8,14 @@ on:
       - 'code/audit_corrected_swdc_candidate.py'
       - '.github/workflows/run-robustness-swdc-revision.yml'
       - 'data/revision_analysis/.trigger'
+  pull_request:
+    branches: [post-freeze-analysis]
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'code/analyze_stance_robustness.py'
+      - 'code/audit_corrected_swdc_candidate.py'
+      - '.github/workflows/run-robustness-swdc-revision.yml'
+      - 'data/revision_analysis/.trigger'
   workflow_dispatch:
 
 permissions:
@@ -50,6 +58,7 @@ jobs:
           PY
 
       - name: Publish revision-audit outputs
+        if: github.event_name == 'push'
         shell: bash
         run: |
           set -euo pipefail
