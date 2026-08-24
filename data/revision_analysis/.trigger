@@ -1,1 +1,1 @@
-2026-08-24T15:20+01:00 derive preregistered criterion relevance matrix and revised SWDC weights
+2026-08-24T15:56+01:00 run semantic sensitivity and prepare revision freeze
