@@ -1,0 +1,16 @@
+{
+  "delta": 0.3,
+  "interpretation": "In the reconstructed Marikana case, criterion-specific documentary relevance drives most of the weight shift. SIC produces only a small additional redistribution across stakeholder groups, and reconstructed contention adds very little beyond SIC because resistance/contention is high across most stakeholder groups. The contention term is therefore a valid dynamic component of the architecture but not the main empirical driver in this case.",
+  "maximum_absolute_full_revision_change_from_base": 0.02215194511527907,
+  "maximum_absolute_increment_from_SIC_over_equal_actor_groups": 0.0002858531223552119,
+  "maximum_absolute_increment_from_contention_over_SIC_only": 0.00039723332910633624,
+  "novelty_implication": "Do not attribute the observed revised weights primarily to sentiment/contention. The demonstrated methodological advance is the non-degenerate criterion-specific propagation architecture; contention is an empirically weak modifier for this case and should be tested across additional cases before being promoted as a core contribution.",
+  "stage": "revised_SCIPRA_component_ablation",
+  "weights_by_mode": {
+    "base_no_revision": {"Community Infrastructure": 0.1, "Geological Feasibility": 0.15, "IRR": 0.2, "Local Employment": 0.15, "Market Stability": 0.15, "NPV": 0.25},
+    "criterion_relevance_SIC_only": {"Community Infrastructure": 0.10957435835315132, "Geological Feasibility": 0.14430764758853382, "IRR": 0.19093877148802704, "Local Employment": 0.172034785449906, "Market Stability": 0.14352822035711485, "NPV": 0.23961621676326705},
+    "criterion_relevance_SIC_times_contention": {"Community Infrastructure": 0.10917712502404499, "Geological Feasibility": 0.14441061233296143, "IRR": 0.19107882323522926, "Local Employment": 0.17215194511527906, "Market Stability": 0.14356789731859113, "NPV": 0.23961359697389406},
+    "criterion_relevance_document_volume": {"Community Infrastructure": 0.10856468389603366, "Geological Feasibility": 0.14370374013327758, "IRR": 0.1909410578601815, "Local Employment": 0.17380185408316326, "Market Stability": 0.1434824304718814, "NPV": 0.23950623355546266},
+    "criterion_relevance_equal_actor_groups": {"Community Infrastructure": 0.10939864133612719, "Geological Feasibility": 0.14444743448374545, "IRR": 0.19105911533245998, "Local Employment": 0.17174893232755079, "Market Stability": 0.14360897251218113, "NPV": 0.23973690400793557}
+  }
+}
