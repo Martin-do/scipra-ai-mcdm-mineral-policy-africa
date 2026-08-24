@@ -8,6 +8,7 @@ DRAFT = DATA / 'reconstructed_annotation_draft.csv'
 RECOVERY = DATA / 'post_freeze_recovery_status.csv'
 OUT = DATA / 'annotation_pass_summary.json'
 RECON = DATA / 'annotation_count_reconciliation.json'
+EXPECTED_MANIFEST_SHA = 'cb280e4cb138b2f6bba48b24f0dcd7521c4cb821871846ceb70523a05a7acad5'
 
 
 def read_csv(path):
@@ -37,6 +38,7 @@ def main():
     ]
     unavailable_review = [r for r in review if r['record_id'] in unavailable_ids]
     recovered_review = [r for r in review if r['record_id'] in recovered_ids]
+    usable_readings = [r for r in rows if r.get('stance_a_label', '') != '' and r.get('stance_b_label', '') != '']
 
     # Exhaustive/disjoint reconciliation.
     assert len(recovered_ids) == 873
@@ -48,6 +50,7 @@ def main():
     assert len(unlabeled_recovered_review) == 138
     assert len(unavailable_review) == 3
     assert len(recovered_review) == 186
+    assert len(usable_readings) == 873
     assert len(labeled_no_review) + len(labeled_review) + len(unlabeled_recovered_review) == 873
     assert len(labeled_no_review) + len(labeled_review) + len(unlabeled_recovered_review) + len(unavailable_review) == 876
     assert len(labeled_review) + len(unlabeled_recovered_review) + len(unavailable_review) == 189
@@ -60,12 +63,15 @@ def main():
     assert sum(stakeholder_counts.values()) == 873
 
     label_counts = Counter(r['draft_reconstructed_label'] for r in labeled)
+    agreement = sum(r['stance_a_label'] == r['stance_b_label'] for r in usable_readings) / len(usable_readings)
 
     summary = {
         'stage': 'post_freeze_computational_reannotation_pass_1_reconciled',
+        'frozen_analysis_manifest_sha256': EXPECTED_MANIFEST_SHA,
         'frozen_analysis_ready_records': 876,
         'texts_recovered_for_execution': 873,
         'texts_unavailable_at_execution': 3,
+        'computational_readings_agreement_rate_on_recovered_text': agreement,
         'draft_labels_assigned_total': 735,
         'draft_label_counts': dict(label_counts),
         'labeled_not_in_review_queue': 687,
@@ -95,6 +101,8 @@ def main():
     }
     OUT.write_text(json.dumps(summary, indent=2, sort_keys=True) + '\n', encoding='utf-8')
     RECON.write_text(json.dumps(summary['reconciliation'] | {
+        'frozen_analysis_manifest_sha256': EXPECTED_MANIFEST_SHA,
+        'computational_readings_agreement_rate_on_recovered_text': agreement,
         'labeled_not_in_review_queue': 687,
         'labeled_but_in_stakeholder_review_queue': 48,
         'unlabeled_recovered_records_in_stance_review_queue': 138,
