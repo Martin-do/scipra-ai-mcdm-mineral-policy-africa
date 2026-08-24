@@ -1,6 +1,6 @@
 """Extract only analysis-method paragraphs from the SCIPRA manuscript/SI DOCX files.
 
-This helper does not alter corpus membership or create labels.  It exists so the
+This helper does not alter corpus membership or create labels. It exists so the
 post-freeze analysis can be checked against the manuscript's stated stance,
 SVM, stakeholder, PCI and RPCI definitions before any new computation.
 """
@@ -12,7 +12,9 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "data" / "post_freeze_analysis" / "methodology_keyword_extract.txt"
+OUTDIR = ROOT / "data" / "post_freeze_analysis"
+OUT = OUTDIR / "methodology_keyword_extract.txt"
+ANNOTATION_OUT = OUTDIR / "annotation_protocol_excerpt.txt"
 SOURCES = [
     ROOT / "appendices" / "SCIPRA_Supplementary_Material.docx",
     ROOT / "SCIPRA_04052026.docx",
@@ -41,21 +43,30 @@ def docx_paragraphs(path: Path) -> list[str]:
 
 
 def main() -> None:
-    OUT.parent.mkdir(parents=True, exist_ok=True)
+    OUTDIR.mkdir(parents=True, exist_ok=True)
     blocks: list[str] = []
+    si_paras: list[str] | None = None
     for src in SOURCES:
         paras = docx_paragraphs(src)
-        hits: list[tuple[int, str]] = [(i, p) for i, p in enumerate(paras) if KEYWORDS.search(p)]
+        if src.name == "SCIPRA_Supplementary_Material.docx":
+            si_paras = paras
+        hits = [(i, p) for i, p in enumerate(paras) if KEYWORDS.search(p)]
         wanted: set[int] = set()
         for i, _ in hits:
-            # include one neighboring paragraph on either side to preserve definitions
             wanted.update(j for j in (i - 1, i, i + 1) if 0 <= j < len(paras))
         blocks.append(f"===== {src.name} =====")
         for i in sorted(wanted):
             blocks.append(f"[{i:04d}] {paras[i]}")
         blocks.append("")
     OUT.write_text("\n".join(blocks), encoding="utf-8")
+
+    if si_paras is None or len(si_paras) <= 730:
+        raise RuntimeError("Supplementary appendix paragraph numbering drifted; cannot export B.4 safely")
+    # Exact B.4 annotation-area excerpt, deliberately narrow to avoid redistributing the full SI.
+    annotation = [f"[{i:04d}] {si_paras[i]}" for i in range(659, 731)]
+    ANNOTATION_OUT.write_text("\n".join(annotation) + "\n", encoding="utf-8")
     print(f"wrote {OUT}")
+    print(f"wrote {ANNOTATION_OUT}")
 
 
 if __name__ == "__main__":
