@@ -37,7 +37,7 @@ EITI_CAVEAT = (
 EXPECTED_DUPLICATE_PAIRS = {
     ("MEDIA-043", "DISC-MEDIA-0650"),
     ("WEB-MEDIA-003", "DISC-MEDIA-0578"),
-    ("expanded_media_candidates_batch1__EXP-MEDIA-037", "DISC-MEDIA-0409"),
+    ("expanded_media_candidates_02__EXP-MEDIA-037", "DISC-MEDIA-0409"),
     ("MEDIA-044", "DISC-MEDIA-0524"),
     ("MEDIA-024", "DISC-MEDIA-0436"),
     ("DISC-MEDIA-0636", "DISC-MEDIA-0648"),
