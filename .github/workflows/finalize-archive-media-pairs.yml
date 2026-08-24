@@ -1,108 +1,12 @@
-name: Finalize archive media republications and cross-phase dedup
+name: Archived — archive media pair finalizer
 
 on:
-  push:
-    branches:
-      - dataset-reconstruction
-    paths:
-      - '.github/workflows/finalize-archive-media-pairs.yml'
-      - 'data/reconstruction/finalize_archive_media_quality_and_pairs.py'
-      - 'data/reconstruction/build_cross_phase_dedup_audit.py'
-      - 'data/reconstruction/finalize_cross_phase_explicit_review.py'
-      - 'data/reconstruction/build_broad_near_duplicate_candidates.py'
-      - 'data/reconstruction/audit_broad_near_duplicate_text.py'
-      - 'data/reconstruction/finalize_broad_near_duplicate_review.py'
-      - 'data/reconstruction/audit_textwide_near_duplicates.py'
-      - 'data/reconstruction/archive_media_same_title_year_similarity_audit.csv'
-      - 'data/reconstruction/archive_media_quality_recovery_audit.csv'
-      - 'data/reconstruction/archive_media_post_titlepair_manifest.csv'
-      - 'data/reconstruction/review_handoff/screened_qc_preliminary_unique_text_manifest.csv'
-      - 'data/reconstruction/review_handoff/screened_qc_near_duplicate_review.csv'
-      - 'data/reconstruction/review_handoff/screened_qc_same_title_year_review.csv'
-  pull_request:
-    types: [synchronize]
-    paths:
-      - '.github/workflows/finalize-archive-media-pairs.yml'
-      - 'data/reconstruction/finalize_archive_media_quality_and_pairs.py'
-      - 'data/reconstruction/build_cross_phase_dedup_audit.py'
-      - 'data/reconstruction/finalize_cross_phase_explicit_review.py'
-      - 'data/reconstruction/build_broad_near_duplicate_candidates.py'
-      - 'data/reconstruction/audit_broad_near_duplicate_text.py'
-      - 'data/reconstruction/finalize_broad_near_duplicate_review.py'
-      - 'data/reconstruction/audit_textwide_near_duplicates.py'
-      - 'data/reconstruction/archive_media_same_title_year_similarity_audit.csv'
-      - 'data/reconstruction/archive_media_quality_recovery_audit.csv'
-      - 'data/reconstruction/archive_media_post_titlepair_manifest.csv'
-      - 'data/reconstruction/review_handoff/screened_qc_preliminary_unique_text_manifest.csv'
-      - 'data/reconstruction/review_handoff/screened_qc_near_duplicate_review.csv'
-      - 'data/reconstruction/review_handoff/screened_qc_same_title_year_review.csv'
   workflow_dispatch:
 
-concurrency:
-  group: scipra-finalize-archive-media-pairs
-  cancel-in-progress: true
-
-permissions:
-  contents: write
-
 jobs:
-  finalize:
+  archived:
     runs-on: ubuntu-latest
-    timeout-minutes: 55
     steps:
-      - name: Checkout reconstruction branch
-        uses: actions/checkout@v4
-        with:
-          ref: dataset-reconstruction
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install extraction and similarity dependencies
-        run: pip install requests beautifulsoup4 trafilatura pypdf scikit-learn==1.4.2
-
-      - name: Finalize quality and republication decisions
-        run: python data/reconstruction/finalize_archive_media_quality_and_pairs.py
-
-      - name: Build conservative cross-phase duplicate audit
-        run: python data/reconstruction/build_cross_phase_dedup_audit.py
-
-      - name: Apply explicit cross-phase and prior-QC duplicate decisions
-        run: python data/reconstruction/finalize_cross_phase_explicit_review.py
-
-      - name: Generate broad near-duplicate review candidates
-        run: python data/reconstruction/build_broad_near_duplicate_candidates.py
-
-      - name: Fetch targeted text evidence for broad candidates
-        run: python data/reconstruction/audit_broad_near_duplicate_text.py
-
-      - name: Finalize broad near-duplicate decisions
-        run: python data/reconstruction/finalize_broad_near_duplicate_review.py
-
-      - name: Run final textwide near-duplicate evidence audit
-        run: python data/reconstruction/audit_textwide_near_duplicates.py
-
-      - name: Show review summaries
-        run: |
-          cat data/reconstruction/archive_media_post_titlepair_summary.json
-          echo
-          cat data/reconstruction/cross_phase_dedup_summary.json
-          echo
-          cat data/reconstruction/cross_phase_post_explicit_summary.json
-          echo
-          cat data/reconstruction/broad_near_duplicate_final_summary.json
-          echo
-          cat data/reconstruction/textwide_near_duplicate_summary.json
-
-      - name: Publish duplicate review outputs
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/reconstruction/archive_media_quality_review_decisions.csv data/reconstruction/archive_media_same_title_year_decisions.csv data/reconstruction/archive_media_post_titlepair_manifest.csv data/reconstruction/archive_media_post_titlepair_summary.json data/reconstruction/cross_phase_match_audit.csv data/reconstruction/cross_phase_safe_duplicate_decisions.csv data/reconstruction/cross_phase_same_title_review.csv data/reconstruction/cross_phase_hash_collision_review.csv data/reconstruction/cross_phase_preliminary_combined_manifest.csv data/reconstruction/cross_phase_dedup_summary.json data/reconstruction/cross_phase_explicit_review_decisions.csv data/reconstruction/cross_phase_post_explicit_manifest.csv data/reconstruction/cross_phase_post_explicit_summary.json data/reconstruction/broad_near_duplicate_candidates.csv data/reconstruction/broad_near_duplicate_candidate_summary.json data/reconstruction/broad_near_duplicate_text_evidence.csv data/reconstruction/broad_near_duplicate_text_evidence_summary.json data/reconstruction/broad_near_duplicate_final_decisions.csv data/reconstruction/prefreeze_manifest_after_broad_duplicate_review.csv data/reconstruction/broad_near_duplicate_final_summary.json data/reconstruction/textwide_recovery_status.csv data/reconstruction/textwide_near_duplicate_candidates.csv data/reconstruction/textwide_near_duplicate_summary.json
-          if ! git diff --cached --quiet; then
-            git commit -m 'Publish SCIPRA final textwide duplicate evidence'
-            git pull --rebase origin dataset-reconstruction
-            git push origin HEAD:dataset-reconstruction
-          fi
+      - run: |
+          echo 'Archive pair review is complete and incorporated into the frozen SCIPRA corpus.'
+          echo 'This workflow is retained for provenance and no longer mutates the reconstruction branch.'
