@@ -1,0 +1,20 @@
+{
+  "files_present": {
+    "POST_FREEZE_ANALYSIS_REPORT.md": false,
+    "annotation_pass_summary.json": true,
+    "post_freeze_analysis_summary.json": false,
+    "reconstructed_stakeholder_attribution_summary.json": true,
+    "reconstructed_stance_summary.json": true,
+    "svm_metrics.json": false
+  },
+  "stage": "final_post_freeze_analysis_diagnostic",
+  "steps": {
+    "adjudicate_stakeholder_attribution": "success",
+    "build_report": "skipped",
+    "dependencies": "success",
+    "finalize_stance_labels": "success",
+    "reconcile_annotation_accounting": "success",
+    "run_svm": "cancelled"
+  },
+  "trigger_head_sha": "7cac9b8f5cd58e99267ece75773636c5f115e983"
+}
