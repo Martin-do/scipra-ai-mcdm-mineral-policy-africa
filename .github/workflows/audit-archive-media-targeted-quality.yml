@@ -1,63 +1,13 @@
-name: Audit targeted archive media quality
+name: Archived — targeted archive media quality audit
 
 on:
-  push:
-    branches:
-      - dataset-reconstruction
-    paths:
-      - '.github/workflows/audit-archive-media-targeted-quality.yml'
-      - 'data/reconstruction/audit_archive_media_targeted_quality.py'
-      - 'data/reconstruction/archive_media_same_title_year_review.csv'
-      - 'data/reconstruction/archive_media_extraction_hash_collisions.csv'
-      - 'data/reconstruction/archive_media_text_hash_exceptions.csv'
-  pull_request:
-    types: [synchronize]
-    paths:
-      - '.github/workflows/audit-archive-media-targeted-quality.yml'
-      - 'data/reconstruction/audit_archive_media_targeted_quality.py'
-      - 'data/reconstruction/archive_media_same_title_year_review.csv'
-      - 'data/reconstruction/archive_media_extraction_hash_collisions.csv'
-      - 'data/reconstruction/archive_media_text_hash_exceptions.csv'
   workflow_dispatch:
 
-concurrency:
-  group: scipra-archive-media-targeted-quality
-  cancel-in-progress: true
-
-permissions:
-  contents: write
-
 jobs:
-  audit:
+  archived:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
     steps:
-      - name: Checkout reconstruction branch
-        uses: actions/checkout@v4
-        with:
-          ref: dataset-reconstruction
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install extraction dependencies
-        run: pip install requests beautifulsoup4 trafilatura
-
-      - name: Refetch targeted quality and title-pair records
-        run: python data/reconstruction/audit_archive_media_targeted_quality.py
-
-      - name: Show targeted quality summary
-        run: cat data/reconstruction/archive_media_targeted_quality_summary.json
-
-      - name: Publish metadata-only quality evidence
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/reconstruction/archive_media_same_title_year_similarity_audit.csv data/reconstruction/archive_media_quality_recovery_audit.csv data/reconstruction/archive_media_targeted_quality_summary.json
-          if ! git diff --cached --quiet; then
-            git commit -m 'Publish targeted archive media quality evidence'
-            git pull --rebase origin dataset-reconstruction
-            git push origin HEAD:dataset-reconstruction
-          fi
+      - run: |
+          echo 'SCIPRA corpus membership is frozen.'
+          echo 'This workflow no longer runs automatically.'
+          echo 'Committed quality-audit scripts and results remain the reconstruction provenance.'
