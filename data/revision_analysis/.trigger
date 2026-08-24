@@ -1,1 +1,1 @@
-2026-08-24T15:56+01:00 run semantic sensitivity and prepare revision freeze
+2026-08-24T16:00+01:00 trigger observable semantic sensitivity verification
