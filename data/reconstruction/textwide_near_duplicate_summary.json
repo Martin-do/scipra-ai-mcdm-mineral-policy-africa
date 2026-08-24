@@ -3,17 +3,16 @@
   "retained_manifest_records": 893,
   "analysis_ready_records_targeted": 883,
   "fresh_recovery_status_counts": {
-    "retrieved_extracted": 875,
-    "retrieved_no_text": 4,
-    "fetch_failed": 4
+    "retrieved_extracted": 879,
+    "retrieved_no_text": 4
   },
   "fresh_extraction_method_counts": {
     "pypdf": 71,
-    "trafilatura": 804
+    "trafilatura": 808
   },
   "global_extraction_collision_groups": 0,
-  "records_usable_for_textwide_similarity": 875,
-  "records_not_usable_for_textwide_similarity": 8,
+  "records_usable_for_textwide_similarity": 879,
+  "records_not_usable_for_textwide_similarity": 4,
   "candidate_pairs_ge_0_92": 7,
   "near_duplicate_pairs_ge_0_95": 7,
   "watch_pairs_0_92_to_0_95": 0,
