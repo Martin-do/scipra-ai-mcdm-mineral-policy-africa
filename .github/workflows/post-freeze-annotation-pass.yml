@@ -1,3 +1,4 @@
+# Registered after creation so the analysis workflow executes from an existing branch workflow.
 name: Run SCIPRA post-freeze annotation pass
 
 on:
