@@ -33,12 +33,13 @@ jobs:
           python-version: '3.11'
       - name: Extract methodology paragraphs
         run: python code/post_freeze_extract_methodology.py
-      - name: Publish extract on push only
+      - name: Publish extracts on push only
         if: github.event_name != 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
           cp data/post_freeze_analysis/methodology_keyword_extract.txt /tmp/methodology_keyword_extract.txt
+          cp data/post_freeze_analysis/annotation_protocol_excerpt.txt /tmp/annotation_protocol_excerpt.txt
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           for attempt in 1 2 3; do
@@ -46,9 +47,10 @@ jobs:
             git reset --hard origin/post-freeze-analysis
             mkdir -p data/post_freeze_analysis
             cp /tmp/methodology_keyword_extract.txt data/post_freeze_analysis/methodology_keyword_extract.txt
-            git add data/post_freeze_analysis/methodology_keyword_extract.txt
+            cp /tmp/annotation_protocol_excerpt.txt data/post_freeze_analysis/annotation_protocol_excerpt.txt
+            git add data/post_freeze_analysis/methodology_keyword_extract.txt data/post_freeze_analysis/annotation_protocol_excerpt.txt
             if git diff --cached --quiet; then exit 0; fi
-            git commit -m 'Publish post-freeze methodology extract'
+            git commit -m 'Publish post-freeze methodology extracts'
             if git push origin HEAD:post-freeze-analysis; then exit 0; fi
             sleep $((attempt * 2))
           done
