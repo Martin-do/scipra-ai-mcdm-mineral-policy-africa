@@ -8,10 +8,22 @@ on:
       - 'code/reconcile_post_freeze_annotation_summary.py'
       - 'data/post_freeze_analysis/REVIEWER_HANDOFF.md'
       - 'data/post_freeze_analysis/.offline-review-trigger'
+  pull_request:
+    branches: [dataset-reconstruction]
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/build-offline-review-bundle.yml'
+      - 'code/reconcile_post_freeze_annotation_summary.py'
+      - 'data/post_freeze_analysis/REVIEWER_HANDOFF.md'
+      - 'data/post_freeze_analysis/.offline-review-trigger'
   workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: scipra-offline-review-bundle-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   bundle:
@@ -102,6 +114,7 @@ jobs:
           mv SCIPRA_OFFLINE_REVIEWER_BUNDLE.zip "$ROOT/SCIPRA_OFFLINE_REVIEWER_BUNDLE.zip"
 
       - name: Publish corrected reconciliation metadata
+        if: github.event_name == 'push'
         shell: bash
         run: |
           set -euo pipefail
