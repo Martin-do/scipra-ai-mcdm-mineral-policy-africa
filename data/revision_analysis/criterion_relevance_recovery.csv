@@ -433,7 +433,7 @@ DISC-MEDIA-0689,government,retrieved_extracted,trafilatura,442,6fcc1cb2aeb96830a
 DISC-MEDIA-0690,government,retrieved_extracted,trafilatura,430,3b38e414bd433ab189a80ce0adc812449da4391dec761ea65a029d44a1806c8f,
 EXP-CORP-004,investor,retrieved_extracted,pypdf,7215,0305307b4198bccbb86086a11a8cb76c9bdde400aa49a5a2b9d7bb4e81b77612,
 EXP-GOV-001,government,retrieved_extracted,trafilatura,2388,94329e929e52daa54c55f42798df85ef0581bcf8ab08f0f602f3f890db2db20a,
-EXP-GOV-002,government,unavailable_for_model_execution,,0,,"ConnectTimeout: HTTPSConnectionPool(host='www.gov.za', port=443): Max retries exceeded with url: /speeches/north-west-human-settlements-marikana-housing-project-7-dec-2015-0000 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.gov.za', port=443) at 0x7fc9b8fec350>, 'Connection to www.gov.za timed out. (connect timeout=60)'))"
+EXP-GOV-002,government,retrieved_extracted,trafilatura,288,4f52a04c1bd7458f6f22fe246b6e598f4a347eceefd8ffa09412cf18272140aa,
 EXP-GOV-004,government,retrieved_extracted,trafilatura,1066,ad5ea50c3d28e5f4c1634555915ddae78c6b997154dabdac16e200e70213ccfb,
 EXP-GOV-005,government,retrieved_extracted,trafilatura,1141,e9df0bcab8bf762154efe94698bbb1fc82273b3c3cd9f454809b348e90767808,
 EXP-GOV-010,government,retrieved_extracted,pypdf,194376,8be1ca547188198fd9698b255d72d6395f007f7b896fdf3c31c16ade4509b1b0,
@@ -481,7 +481,7 @@ EXP-NGO-030,NGO,retrieved_extracted,pypdf,699,bc887c9d23761aaf82b447fe3f472d155f
 EXP-OFFICIAL-013,community,retrieved_extracted,pypdf,15488,c09bc39d845361f563838c7e312d23807c4d75bab5d99bc570b6e265902998e2,
 EXP-OFFICIAL-015,community,retrieved_extracted,pypdf,9709,ce6d1279aa31a55ad26a42be7fda79a98519d7b83c618c0b22e41469f2f3161d,
 GOV-SAT-001,government,retrieved_extracted,trafilatura,603,4d6d7e4d2f13f3458cd2a96d772980b681fce5564f9a7d6467012152b6702d75,
-INST-001,government,retrieved_extracted,pypdf,153495,94665832387751bfc73e5f241d0971bf0500a9e28cfc37154b5e621cde8daf07,
+INST-001,government,unavailable_for_model_execution,,0,,no_body_ge_80_words
 INST-002,NGO,retrieved_extracted,pypdf,51202,8f8867497238f8fbf27adf841646975fe945d5271fa51f2099f7b95eaaeccfd1,
 INST-003,NGO,retrieved_extracted,pypdf,61984,56cf94d44f0f8d3d29cf06b1dad8e80d7bb861d5b5dd3f52b4f4a67d4b8c5c31,
 INST-005,NGO,retrieved_extracted,pypdf,267,bed492ab350792e9810a2f386182358089507fb54239d342822a236daf2cbcb8,

@@ -2603,6 +2603,12 @@ EXP-GOV-001,government,IRR,0,0,86,false,false,false,false
 EXP-GOV-001,government,Local Employment,14,5,86,true,true,true,true
 EXP-GOV-001,government,Market Stability,0,0,86,false,false,false,false
 EXP-GOV-001,government,NPV,0,0,86,false,false,false,false
+EXP-GOV-002,government,Community Infrastructure,4,2,16,true,true,true,true
+EXP-GOV-002,government,Geological Feasibility,0,0,16,false,false,false,false
+EXP-GOV-002,government,IRR,0,0,16,false,false,false,false
+EXP-GOV-002,government,Local Employment,1,1,16,true,false,false,false
+EXP-GOV-002,government,Market Stability,0,0,16,false,false,false,false
+EXP-GOV-002,government,NPV,0,0,16,false,false,false,false
 EXP-GOV-004,government,Community Infrastructure,12,6,43,true,true,true,true
 EXP-GOV-004,government,Geological Feasibility,3,1,43,true,true,false,false
 EXP-GOV-004,government,IRR,0,0,43,false,false,false,false
@@ -2885,12 +2891,6 @@ GOV-SAT-001,government,IRR,0,0,26,false,false,false,false
 GOV-SAT-001,government,Local Employment,0,0,26,false,false,false,false
 GOV-SAT-001,government,Market Stability,0,0,26,false,false,false,false
 GOV-SAT-001,government,NPV,0,0,26,false,false,false,false
-INST-001,government,Community Infrastructure,137,7,4673,true,true,true,true
-INST-001,government,Geological Feasibility,13,1,4673,true,true,false,false
-INST-001,government,IRR,0,0,4673,false,false,false,false
-INST-001,government,Local Employment,285,7,4673,true,true,true,true
-INST-001,government,Market Stability,0,0,4673,false,false,false,false
-INST-001,government,NPV,0,0,4673,false,false,false,false
 INST-002,NGO,Community Infrastructure,198,10,1974,true,true,true,true
 INST-002,NGO,Geological Feasibility,10,4,1974,true,true,true,true
 INST-002,NGO,IRR,0,0,1974,false,false,false,false

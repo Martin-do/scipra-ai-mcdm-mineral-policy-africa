@@ -1,7 +1,7 @@
 min_matched_sentences,min_distinct_families,stakeholder_group,criterion,recovered_documents,relevant_documents,A_sj
 1,1,government,NPV,319,0,0.0
 1,1,government,IRR,319,0,0.0
-1,1,government,Geological Feasibility,319,52,0.16300940438871472
+1,1,government,Geological Feasibility,319,51,0.15987460815047022
 1,1,government,Market Stability,319,0,0.0
 1,1,government,Local Employment,319,261,0.8181818181818182
 1,1,government,Community Infrastructure,319,158,0.4952978056426332
@@ -31,9 +31,9 @@ min_matched_sentences,min_distinct_families,stakeholder_group,criterion,recovere
 1,1,NGO,Community Infrastructure,32,15,0.46875
 2,1,government,NPV,319,0,0.0
 2,1,government,IRR,319,0,0.0
-2,1,government,Geological Feasibility,319,19,0.05956112852664577
+2,1,government,Geological Feasibility,319,18,0.05642633228840126
 2,1,government,Market Stability,319,0,0.0
-2,1,government,Local Employment,319,196,0.6144200626959248
+2,1,government,Local Employment,319,195,0.6112852664576802
 2,1,government,Community Infrastructure,319,110,0.3448275862068966
 2,1,investor,NPV,147,17,0.11564625850340136
 2,1,investor,IRR,147,7,0.047619047619047616
@@ -63,7 +63,7 @@ min_matched_sentences,min_distinct_families,stakeholder_group,criterion,recovere
 2,2,government,IRR,319,0,0.0
 2,2,government,Geological Feasibility,319,0,0.0
 2,2,government,Market Stability,319,0,0.0
-2,2,government,Local Employment,319,170,0.5329153605015674
+2,2,government,Local Employment,319,169,0.5297805642633229
 2,2,government,Community Infrastructure,319,90,0.28213166144200624
 2,2,investor,NPV,147,13,0.08843537414965986
 2,2,investor,IRR,147,3,0.02040816326530612
@@ -93,7 +93,7 @@ min_matched_sentences,min_distinct_families,stakeholder_group,criterion,recovere
 3,2,government,IRR,319,0,0.0
 3,2,government,Geological Feasibility,319,0,0.0
 3,2,government,Market Stability,319,0,0.0
-3,2,government,Local Employment,319,139,0.43573667711598746
+3,2,government,Local Employment,319,138,0.43260188087774293
 3,2,government,Community Infrastructure,319,37,0.11598746081504702
 3,2,investor,NPV,147,8,0.05442176870748299
 3,2,investor,IRR,147,2,0.013605442176870748
