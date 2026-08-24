@@ -1,4 +1,4 @@
-name: Finalize archive media republications
+name: Finalize archive media republications and cross-phase dedup
 
 on:
   push:
@@ -7,15 +7,21 @@ on:
     paths:
       - '.github/workflows/finalize-archive-media-pairs.yml'
       - 'data/reconstruction/finalize_archive_media_quality_and_pairs.py'
+      - 'data/reconstruction/build_cross_phase_dedup_audit.py'
       - 'data/reconstruction/archive_media_same_title_year_similarity_audit.csv'
       - 'data/reconstruction/archive_media_quality_recovery_audit.csv'
+      - 'data/reconstruction/archive_media_post_titlepair_manifest.csv'
+      - 'data/reconstruction/review_handoff/screened_qc_preliminary_unique_text_manifest.csv'
   pull_request:
     types: [synchronize]
     paths:
       - '.github/workflows/finalize-archive-media-pairs.yml'
       - 'data/reconstruction/finalize_archive_media_quality_and_pairs.py'
+      - 'data/reconstruction/build_cross_phase_dedup_audit.py'
       - 'data/reconstruction/archive_media_same_title_year_similarity_audit.csv'
       - 'data/reconstruction/archive_media_quality_recovery_audit.csv'
+      - 'data/reconstruction/archive_media_post_titlepair_manifest.csv'
+      - 'data/reconstruction/review_handoff/screened_qc_preliminary_unique_text_manifest.csv'
   workflow_dispatch:
 
 concurrency:
@@ -42,16 +48,22 @@ jobs:
       - name: Finalize quality and republication decisions
         run: python data/reconstruction/finalize_archive_media_quality_and_pairs.py
 
-      - name: Show final pair-review summary
-        run: cat data/reconstruction/archive_media_post_titlepair_summary.json
+      - name: Build conservative cross-phase duplicate audit
+        run: python data/reconstruction/build_cross_phase_dedup_audit.py
 
-      - name: Publish final pair and quality review
+      - name: Show review summaries
+        run: |
+          cat data/reconstruction/archive_media_post_titlepair_summary.json
+          echo
+          cat data/reconstruction/cross_phase_dedup_summary.json
+
+      - name: Publish pair, quality and cross-phase review
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/reconstruction/archive_media_quality_review_decisions.csv data/reconstruction/archive_media_same_title_year_decisions.csv data/reconstruction/archive_media_post_titlepair_manifest.csv data/reconstruction/archive_media_post_titlepair_summary.json
+          git add data/reconstruction/archive_media_quality_review_decisions.csv data/reconstruction/archive_media_same_title_year_decisions.csv data/reconstruction/archive_media_post_titlepair_manifest.csv data/reconstruction/archive_media_post_titlepair_summary.json data/reconstruction/cross_phase_match_audit.csv data/reconstruction/cross_phase_safe_duplicate_decisions.csv data/reconstruction/cross_phase_same_title_review.csv data/reconstruction/cross_phase_hash_collision_review.csv data/reconstruction/cross_phase_preliminary_combined_manifest.csv data/reconstruction/cross_phase_dedup_summary.json
           if ! git diff --cached --quiet; then
-            git commit -m 'Publish archive media republication and quality review'
+            git commit -m 'Publish archive and cross-phase duplicate review'
             git pull --rebase origin dataset-reconstruction
             git push origin HEAD:dataset-reconstruction
           fi
