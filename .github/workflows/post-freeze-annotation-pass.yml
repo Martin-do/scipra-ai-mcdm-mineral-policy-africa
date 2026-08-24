@@ -1,0 +1,77 @@
+name: Run SCIPRA post-freeze annotation pass
+
+on:
+  push:
+    branches: [post-freeze-analysis]
+    paths:
+      - 'code/post_freeze_annotation_pass.py'
+      - '.github/workflows/post-freeze-annotation-pass.yml'
+  pull_request:
+    branches: [dataset-reconstruction]
+    types: [synchronize, opened, reopened]
+    paths:
+      - 'code/post_freeze_annotation_pass.py'
+      - '.github/workflows/post-freeze-annotation-pass.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scipra-post-freeze-annotation
+  cancel-in-progress: true
+
+jobs:
+  annotate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: post-freeze-analysis
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install extraction dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 pypdf pymupdf trafilatura
+      - name: Run computational re-annotation pass
+        run: python code/post_freeze_annotation_pass.py
+      - name: Show annotation summary
+        run: cat data/post_freeze_analysis/annotation_pass_summary.json
+      - name: Upload annotation audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: scipra-post-freeze-annotation-pass
+          path: |
+            data/post_freeze_analysis/post_freeze_recovery_status.csv
+            data/post_freeze_analysis/reconstructed_annotation_draft.csv
+            data/post_freeze_analysis/annotation_review_queue.csv
+            data/post_freeze_analysis/annotation_pass_summary.json
+          retention-days: 30
+      - name: Publish derived annotation metadata on push only
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          TMP=/tmp/scipra-post-freeze-annotation
+          rm -rf "$TMP" && mkdir -p "$TMP"
+          cp data/post_freeze_analysis/post_freeze_recovery_status.csv "$TMP/"
+          cp data/post_freeze_analysis/reconstructed_annotation_draft.csv "$TMP/"
+          cp data/post_freeze_analysis/annotation_review_queue.csv "$TMP/"
+          cp data/post_freeze_analysis/annotation_pass_summary.json "$TMP/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3 4; do
+            git fetch origin post-freeze-analysis
+            git reset --hard origin/post-freeze-analysis
+            mkdir -p data/post_freeze_analysis
+            cp "$TMP"/* data/post_freeze_analysis/
+            git add data/post_freeze_analysis/post_freeze_recovery_status.csv data/post_freeze_analysis/reconstructed_annotation_draft.csv data/post_freeze_analysis/annotation_review_queue.csv data/post_freeze_analysis/annotation_pass_summary.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'Publish post-freeze annotation pass'
+            if git push origin HEAD:post-freeze-analysis; then exit 0; fi
+            sleep $((attempt * 2))
+          done
+          exit 1
