@@ -1,4 +1,5 @@
-# Triggered after first creation so GitHub Actions observes the workflow on this branch.
+# Dedicated final textwide audit. Publication preserves generated metadata-only
+# outputs across concurrent branch updates instead of rebasing generated files.
 name: Audit SCIPRA textwide near duplicates
 
 on:
@@ -42,13 +43,38 @@ jobs:
       - name: Show textwide audit summary
         run: cat data/reconstruction/textwide_near_duplicate_summary.json
 
-      - name: Publish metadata-only textwide audit
+      - name: Publish metadata-only textwide audit safely
+        shell: bash
         run: |
+          set -euo pipefail
+          OUTDIR="/tmp/scipra-textwide-output"
+          rm -rf "$OUTDIR"
+          mkdir -p "$OUTDIR"
+          cp data/reconstruction/textwide_recovery_status.csv "$OUTDIR/"
+          cp data/reconstruction/textwide_near_duplicate_candidates.csv "$OUTDIR/"
+          cp data/reconstruction/textwide_near_duplicate_summary.json "$OUTDIR/"
+
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/reconstruction/textwide_recovery_status.csv data/reconstruction/textwide_near_duplicate_candidates.csv data/reconstruction/textwide_near_duplicate_summary.json
-          if ! git diff --cached --quiet; then
+
+          for attempt in 1 2 3 4; do
+            echo "Publish attempt $attempt"
+            git fetch origin dataset-reconstruction
+            git reset --hard origin/dataset-reconstruction
+            cp "$OUTDIR/textwide_recovery_status.csv" data/reconstruction/
+            cp "$OUTDIR/textwide_near_duplicate_candidates.csv" data/reconstruction/
+            cp "$OUTDIR/textwide_near_duplicate_summary.json" data/reconstruction/
+            git add data/reconstruction/textwide_recovery_status.csv data/reconstruction/textwide_near_duplicate_candidates.csv data/reconstruction/textwide_near_duplicate_summary.json
+            if git diff --cached --quiet; then
+              echo "Textwide outputs already published."
+              exit 0
+            fi
             git commit -m 'Publish SCIPRA textwide near-duplicate evidence'
-            git pull --rebase origin dataset-reconstruction
-            git push origin HEAD:dataset-reconstruction
-          fi
+            if git push origin HEAD:dataset-reconstruction; then
+              exit 0
+            fi
+            echo "Concurrent update detected; retrying from latest branch."
+            sleep $((attempt * 2))
+          done
+          echo "Unable to publish textwide outputs after four attempts." >&2
+          exit 1
