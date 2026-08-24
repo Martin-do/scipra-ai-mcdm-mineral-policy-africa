@@ -1,45 +1,16 @@
-# Deterministic membership freeze with observable same-repo PR execution.
-name: Finalize SCIPRA reconstructed corpus freeze
+name: Verify SCIPRA frozen reconstructed corpus
 
 on:
-  push:
-    branches:
-      - dataset-reconstruction
-    paths:
-      - '.github/workflows/finalize-scipra-corpus-freeze.yml'
-      - 'data/reconstruction/finalize_textwide_near_duplicate_review.py'
-      - 'data/reconstruction/prefreeze_manifest_after_broad_duplicate_review.csv'
-      - 'data/reconstruction/textwide_near_duplicate_candidates.csv'
-      - 'data/reconstruction/textwide_recovery_status.csv'
-      - 'data/reconstruction/review_handoff/screened_qc_preliminary_unique_text_manifest.csv'
-      - 'data/reconstruction/media_substantive_decision_summary.json'
-      - 'data/reconstruction/secondary_media_substantive_decision_summary.json'
-  pull_request:
-    branches: [main]
-    types: [synchronize, reopened]
-    paths:
-      - '.github/workflows/finalize-scipra-corpus-freeze.yml'
-      - 'data/reconstruction/finalize_textwide_near_duplicate_review.py'
-      - 'data/reconstruction/prefreeze_manifest_after_broad_duplicate_review.csv'
-      - 'data/reconstruction/textwide_near_duplicate_candidates.csv'
-      - 'data/reconstruction/textwide_recovery_status.csv'
-      - 'data/reconstruction/review_handoff/screened_qc_preliminary_unique_text_manifest.csv'
-      - 'data/reconstruction/media_substantive_decision_summary.json'
-      - 'data/reconstruction/secondary_media_substantive_decision_summary.json'
   workflow_dispatch:
 
-concurrency:
-  group: scipra-corpus-freeze-finalizer-${{ github.event_name }}
-  cancel-in-progress: true
-
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  freeze:
+  verify-freeze:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout reconstruction branch
+      - name: Checkout frozen reconstruction branch
         uses: actions/checkout@v4
         with:
           ref: dataset-reconstruction
@@ -49,66 +20,11 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Finalize textwide review and freeze corpus
+      - name: Re-run deterministic freeze assertions
         run: python data/reconstruction/finalize_textwide_near_duplicate_review.py
 
-      - name: Show freeze summary and hashes
+      - name: Show verified freeze summary and hashes
         run: |
           cat data/reconstruction/corpus_freeze_summary.json
           echo
           cat data/reconstruction/corpus_freeze_hashes.json
-
-      - name: Publish frozen corpus outputs safely
-        if: github.event_name != 'pull_request'
-        shell: bash
-        run: |
-          set -euo pipefail
-          OUTDIR="/tmp/scipra-freeze-output"
-          rm -rf "$OUTDIR"
-          mkdir -p "$OUTDIR"
-          for f in \
-            textwide_near_duplicate_final_decisions.csv \
-            textwide_recovery_reconciliation.csv \
-            canonical_reconstructed_replication_corpus.csv \
-            canonical_analysis_ready_manifest.csv \
-            corpus_freeze_hashes.json \
-            corpus_freeze_summary.json; do
-            cp "data/reconstruction/$f" "$OUTDIR/$f"
-          done
-
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-
-          for attempt in 1 2 3 4; do
-            echo "Publish attempt $attempt"
-            git fetch origin dataset-reconstruction
-            git reset --hard origin/dataset-reconstruction
-            for f in \
-              textwide_near_duplicate_final_decisions.csv \
-              textwide_recovery_reconciliation.csv \
-              canonical_reconstructed_replication_corpus.csv \
-              canonical_analysis_ready_manifest.csv \
-              corpus_freeze_hashes.json \
-              corpus_freeze_summary.json; do
-              cp "$OUTDIR/$f" "data/reconstruction/$f"
-            done
-            git add \
-              data/reconstruction/textwide_near_duplicate_final_decisions.csv \
-              data/reconstruction/textwide_recovery_reconciliation.csv \
-              data/reconstruction/canonical_reconstructed_replication_corpus.csv \
-              data/reconstruction/canonical_analysis_ready_manifest.csv \
-              data/reconstruction/corpus_freeze_hashes.json \
-              data/reconstruction/corpus_freeze_summary.json
-            if git diff --cached --quiet; then
-              echo "Freeze outputs already published."
-              exit 0
-            fi
-            git commit -m 'Freeze SCIPRA reconstructed replication corpus'
-            if git push origin HEAD:dataset-reconstruction; then
-              exit 0
-            fi
-            echo "Concurrent update detected; retrying from latest branch."
-            sleep $((attempt * 2))
-          done
-          echo "Unable to publish freeze outputs after four attempts." >&2
-          exit 1
