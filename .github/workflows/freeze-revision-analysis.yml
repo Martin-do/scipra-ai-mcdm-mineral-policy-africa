@@ -1,0 +1,45 @@
+name: Freeze SCIPRA revision analysis
+
+on:
+  push:
+    branches: [robustness-swdc-revision]
+    paths:
+      - 'code/freeze_revision_analysis.py'
+      - '.github/workflows/freeze-revision-analysis.yml'
+      - 'data/revision_analysis/.freeze-trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: robustness-swdc-revision
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build static freeze metadata
+        run: python code/freeze_revision_analysis.py
+      - name: Verify manuscript exclusion boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git ls-files | grep -Ei '(^|/)(manuscript|paper|submission).*(\.docx?|\.pdf|\.tex)$'; then
+            echo 'A manuscript/submission artifact is tracked; canonical transfer must remain manuscript-free.' >&2
+            exit 1
+          fi
+      - name: Commit frozen revision metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/revision_analysis/revision_freeze_hashes.json \
+                  data/revision_analysis/revision_freeze_summary.json \
+                  data/revision_analysis/REVISION_FREEZE_README.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Freeze completed SCIPRA revision analysis'
+          git push origin HEAD:robustness-swdc-revision
