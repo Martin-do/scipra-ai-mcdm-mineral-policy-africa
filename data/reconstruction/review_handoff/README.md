@@ -10,13 +10,13 @@ The manuscript historically reported **N=87**. During reproducibility reconstruc
 
 - Candidates processed in this screened-only snapshot: **366**
 - Acquisition status: **{"acquired_extracted": 359, "acquired_low_text": 2, "acquired_no_text": 5}**
-- Unique extracted texts after exact SHA-256 deduplication, before manual exclusions: **302**
-- Preliminary screened corpus after exact deduplication and prospective exclusions: **300**
+- Unique extracted texts after exact SHA-256 deduplication, before manual exclusions: **303**
+- Preliminary screened corpus after exact deduplication and prospective exclusions: **301**
 - Acquisition exceptions: **7**
-- Exact duplicate clusters / redundant records: **54 / 57**
-- Same-title/year clusters still flagged: **6**
-- Same-URL clusters still flagged: **1**
-- Near-duplicate pairs at similarity >= 0.95: **6**
+- Exact duplicate clusters / redundant records: **54 / 56**
+- Same-title/year clusters still flagged: **7**
+- Same-URL clusters still flagged: **2**
+- Near-duplicate pairs at similarity >= 0.95: **7**
 
 The main row-level dataset for review is `screened_qc_preliminary_unique_text_manifest.csv`. It contains source URLs, metadata, acquisition details and text hashes; it does **not** redistribute full copyrighted news text.
 
