@@ -1,0 +1,97 @@
+name: Verify SCIPRA final post-freeze analysis
+
+on:
+  pull_request:
+    branches: [dataset-reconstruction]
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/run-post-freeze-final-analysis-observable.yml'
+      - 'data/post_freeze_analysis/.final-analysis-observable-trigger'
+      - 'code/reconcile_post_freeze_annotation_summary.py'
+      - 'code/finalize_post_freeze_annotations.py'
+      - 'code/adjudicate_post_freeze_stakeholders.py'
+      - 'code/run_post_freeze_model_analysis_v2.py'
+      - 'code/build_post_freeze_analysis_report_v2.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scipra-post-freeze-final-analysis-observable
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: post-freeze-analysis
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests trafilatura beautifulsoup4 pypdf pymupdf numpy scikit-learn
+      - name: Reconcile annotation accounting
+        run: python code/reconcile_post_freeze_annotation_summary.py
+      - name: Finalize stance labels
+        run: python code/finalize_post_freeze_annotations.py
+      - name: Adjudicate stakeholder attribution
+        run: python code/adjudicate_post_freeze_stakeholders.py
+      - name: Run leakage-safe SVM
+        run: python code/run_post_freeze_model_analysis_v2.py
+      - name: Build report
+        run: python code/build_post_freeze_analysis_report_v2.py
+      - name: Assert invariants
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('data/post_freeze_analysis')
+          expected='cb280e4cb138b2f6bba48b24f0dcd7521c4cb821871846ceb70523a05a7acad5'
+          ann=json.loads((p/'annotation_pass_summary.json').read_text())
+          stance=json.loads((p/'reconstructed_stance_summary.json').read_text())
+          stake=json.loads((p/'reconstructed_stakeholder_attribution_summary.json').read_text())
+          svm=json.loads((p/'svm_metrics.json').read_text())
+          summary=json.loads((p/'post_freeze_analysis_summary.json').read_text())
+          assert ann['frozen_analysis_manifest_sha256']==expected
+          assert stance['frozen_analysis_manifest_sha256']==expected
+          assert stake['frozen_analysis_manifest_sha256']==expected
+          assert svm['frozen_analysis_manifest_sha256']==expected
+          assert stance['final_model_eligible_labelled_records'] + stance['unresolved_records_excluded_from_model'] == 876
+          assert set(stance['observed_reconstructed_class_counts']) == {'0','1'}
+          assert stake['final_stakeholder_resolved_records'] + stake['final_stakeholder_unresolved_excluded_from_group_aggregation'] == stance['final_model_eligible_labelled_records']
+          assert set(stake['final_group_counts']) == {'NGO','community','government','investor','labour'}
+          assert summary['historical_labels_recovered'] is False
+          assert summary['historical_71_16_used_as_target'] is False
+          print(json.dumps({'annotation':ann,'stance':stance,'stakeholder':stake,'svm':svm,'summary':summary}, indent=2))
+          PY
+      - name: Upload verification artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SCIPRA_POST_FREEZE_FINAL_ANALYSIS_VERIFICATION
+          path: |
+            data/post_freeze_analysis/annotation_pass_summary.json
+            data/post_freeze_analysis/annotation_count_reconciliation.json
+            data/post_freeze_analysis/reconstructed_stance_labels_final.csv
+            data/post_freeze_analysis/reconstructed_stance_unresolved.csv
+            data/post_freeze_analysis/reconstructed_stance_summary.json
+            data/post_freeze_analysis/reconstructed_stance_hashes.json
+            data/post_freeze_analysis/reconstructed_stakeholder_attribution_final.csv
+            data/post_freeze_analysis/reconstructed_stakeholder_attribution_unresolved.csv
+            data/post_freeze_analysis/reconstructed_stakeholder_attribution_summary.json
+            data/post_freeze_analysis/reconstructed_stakeholder_attribution_hashes.json
+            data/post_freeze_analysis/svm_oof_predictions.csv
+            data/post_freeze_analysis/svm_metrics.json
+            data/post_freeze_analysis/stakeholder_acceptance_oof.csv
+            data/post_freeze_analysis/corpus_derived_indices.json
+            data/post_freeze_analysis/model_execution_recovery.csv
+            data/post_freeze_analysis/post_freeze_model_hashes.json
+            data/post_freeze_analysis/POST_FREEZE_ANALYSIS_REPORT.md
+            data/post_freeze_analysis/post_freeze_analysis_summary.json
+            data/post_freeze_analysis/post_freeze_analysis_hashes.json
+          retention-days: 30

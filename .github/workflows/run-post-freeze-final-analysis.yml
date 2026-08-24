@@ -1,0 +1,126 @@
+name: Run SCIPRA final post-freeze analysis
+
+on:
+  push:
+    branches: [post-freeze-analysis]
+    paths:
+      - '.github/workflows/run-post-freeze-final-analysis.yml'
+      - 'data/post_freeze_analysis/.final-analysis-trigger'
+      - 'code/reconcile_post_freeze_annotation_summary.py'
+      - 'code/finalize_post_freeze_annotations.py'
+      - 'code/adjudicate_post_freeze_stakeholders.py'
+      - 'code/run_post_freeze_model_analysis_v2.py'
+      - 'code/build_post_freeze_analysis_report_v2.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scipra-post-freeze-final-analysis
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: post-freeze-analysis
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install analysis dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests trafilatura beautifulsoup4 pypdf pymupdf numpy scikit-learn
+
+      - name: Reconcile pass-1 annotation accounting
+        run: python code/reconcile_post_freeze_annotation_summary.py
+
+      - name: Finalize reconstructed stance labels
+        run: python code/finalize_post_freeze_annotations.py
+
+      - name: Adjudicate low-confidence stakeholder attribution
+        run: python code/adjudicate_post_freeze_stakeholders.py
+
+      - name: Run leakage-safe TF-IDF RBF-SVM analysis
+        run: python code/run_post_freeze_model_analysis_v2.py
+
+      - name: Build final post-freeze audit report
+        run: python code/build_post_freeze_analysis_report_v2.py
+
+      - name: Assert final analysis invariants
+        run: |
+          python - <<'PY'
+          import csv, json
+          from pathlib import Path
+          p=Path('data/post_freeze_analysis')
+          ann=json.loads((p/'annotation_pass_summary.json').read_text())
+          stance=json.loads((p/'reconstructed_stance_summary.json').read_text())
+          stake=json.loads((p/'reconstructed_stakeholder_attribution_summary.json').read_text())
+          svm=json.loads((p/'svm_metrics.json').read_text())
+          summary=json.loads((p/'post_freeze_analysis_summary.json').read_text())
+          expected='cb280e4cb138b2f6bba48b24f0dcd7521c4cb821871846ceb70523a05a7acad5'
+          assert ann['frozen_analysis_manifest_sha256']==expected
+          assert stance['frozen_analysis_manifest_sha256']==expected
+          assert stake['frozen_analysis_manifest_sha256']==expected
+          assert svm['frozen_analysis_manifest_sha256']==expected
+          assert ann['frozen_analysis_ready_records']==876
+          assert ann['texts_recovered_for_execution']==873
+          assert ann['labeled_not_in_review_queue'] + ann['labeled_but_in_stakeholder_review_queue'] + ann['unlabeled_recovered_records_in_stance_review_queue'] == 873
+          assert stance['final_model_eligible_labelled_records'] + stance['unresolved_records_excluded_from_model'] == 876
+          assert set(stance['observed_reconstructed_class_counts']) == {'0','1'}
+          assert stake['stance_labelled_records']==stance['final_model_eligible_labelled_records']
+          assert stake['final_stakeholder_resolved_records'] + stake['final_stakeholder_unresolved_excluded_from_group_aggregation'] == stance['final_model_eligible_labelled_records']
+          assert set(stake['final_group_counts']) == {'NGO','community','government','investor','labour'}
+          assert svm['model_evaluable_records_after_fresh_text_recovery'] <= stance['final_model_eligible_labelled_records']
+          assert summary['historical_labels_recovered'] is False
+          assert summary['historical_71_16_used_as_target'] is False
+          print(json.dumps({'annotation':ann,'stance':stance,'stakeholder':stake,'svm':svm,'final_summary':summary}, indent=2))
+          PY
+
+      - name: Stage exact outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          STAGE="$RUNNER_TEMP/post_freeze_outputs"
+          mkdir -p "$STAGE"
+          for f in \
+            annotation_pass_summary.json annotation_count_reconciliation.json \
+            reconstructed_stance_labels_final.csv reconstructed_stance_unresolved.csv reconstructed_stance_summary.json reconstructed_stance_hashes.json \
+            reconstructed_stakeholder_attribution_final.csv reconstructed_stakeholder_attribution_unresolved.csv reconstructed_stakeholder_attribution_summary.json reconstructed_stakeholder_attribution_hashes.json \
+            svm_oof_predictions.csv svm_metrics.json stakeholder_acceptance_oof.csv corpus_derived_indices.json model_execution_recovery.csv post_freeze_model_hashes.json \
+            POST_FREEZE_ANALYSIS_REPORT.md post_freeze_analysis_summary.json post_freeze_analysis_hashes.json; do
+              cp "data/post_freeze_analysis/$f" "$STAGE/$f"
+          done
+
+      - name: Upload final analysis artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SCIPRA_POST_FREEZE_FINAL_ANALYSIS
+          path: ${{ runner.temp }}/post_freeze_outputs/
+          retention-days: 30
+
+      - name: Publish final post-freeze outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          STAGE="$RUNNER_TEMP/post_freeze_outputs"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            git fetch origin post-freeze-analysis
+            git reset --hard origin/post-freeze-analysis
+            mkdir -p data/post_freeze_analysis
+            cp "$STAGE"/* data/post_freeze_analysis/
+            git add data/post_freeze_analysis/
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'Publish final post-freeze reconstructed analysis'
+            if git push origin HEAD:post-freeze-analysis; then exit 0; fi
+            sleep $((attempt * 3))
+          done
+          exit 1

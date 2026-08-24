@@ -1,0 +1,57 @@
+# Registered workflow; deterministic and independent of annotation crawl.
+name: Audit SCIPRA post-freeze MCDM and index formulas
+
+on:
+  push:
+    branches: [post-freeze-analysis]
+    paths:
+      - 'code/audit_post_freeze_mcdm_formulas.py'
+      - '.github/workflows/post-freeze-mathematical-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scipra-post-freeze-math-audit
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: post-freeze-analysis
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run deterministic formula audit
+        run: python code/audit_post_freeze_mcdm_formulas.py
+      - name: Show audit
+        run: |
+          cat data/post_freeze_analysis/mcdm_reproducibility_audit.json
+          cat data/post_freeze_analysis/scenario_formula_validation.csv
+      - name: Publish mathematical audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          TMP=/tmp/scipra-math-audit
+          rm -rf "$TMP" && mkdir -p "$TMP"
+          cp data/post_freeze_analysis/mcdm_reproducibility_audit.json "$TMP/"
+          cp data/post_freeze_analysis/scenario_formula_validation.csv "$TMP/"
+          cp data/post_freeze_analysis/mathematical_audit_hashes.json "$TMP/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            git fetch origin post-freeze-analysis
+            git reset --hard origin/post-freeze-analysis
+            mkdir -p data/post_freeze_analysis
+            cp "$TMP"/* data/post_freeze_analysis/
+            git add data/post_freeze_analysis/mcdm_reproducibility_audit.json data/post_freeze_analysis/scenario_formula_validation.csv data/post_freeze_analysis/mathematical_audit_hashes.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'Publish post-freeze mathematical audit'
+            if git push origin HEAD:post-freeze-analysis; then exit 0; fi
+            sleep $((attempt * 2))
+          done
+          exit 1

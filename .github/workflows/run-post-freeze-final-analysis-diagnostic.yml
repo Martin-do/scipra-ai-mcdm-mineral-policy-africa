@@ -1,0 +1,126 @@
+name: Diagnose SCIPRA final post-freeze analysis
+
+on:
+  push:
+    branches: [post-freeze-analysis]
+    paths:
+      - '.github/workflows/run-post-freeze-final-analysis-diagnostic.yml'
+      - 'data/post_freeze_analysis/.final-analysis-diagnostic-trigger'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scipra-post-freeze-final-analysis-diagnostic
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: post-freeze-analysis
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        id: deps
+        continue-on-error: true
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests trafilatura beautifulsoup4 pypdf pymupdf numpy scikit-learn
+
+      - name: Reconcile annotation accounting
+        id: reconcile
+        continue-on-error: true
+        run: python code/reconcile_post_freeze_annotation_summary.py
+
+      - name: Finalize stance labels
+        id: stance
+        continue-on-error: true
+        run: python code/finalize_post_freeze_annotations.py
+
+      - name: Adjudicate stakeholder attribution
+        id: stakeholder
+        continue-on-error: true
+        run: python code/adjudicate_post_freeze_stakeholders.py
+
+      - name: Run leakage-safe SVM
+        id: svm
+        continue-on-error: true
+        run: python code/run_post_freeze_model_analysis_v2.py
+
+      - name: Build report
+        id: report
+        continue-on-error: true
+        run: python code/build_post_freeze_analysis_report_v2.py
+
+      - name: Write diagnostic status
+        if: always()
+        env:
+          DEPS: ${{ steps.deps.outcome }}
+          RECONCILE: ${{ steps.reconcile.outcome }}
+          STANCE: ${{ steps.stance.outcome }}
+          STAKEHOLDER: ${{ steps.stakeholder.outcome }}
+          SVM: ${{ steps.svm.outcome }}
+          REPORT: ${{ steps.report.outcome }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p=Path('data/post_freeze_analysis')
+          status={
+            'stage':'final_post_freeze_analysis_diagnostic',
+            'trigger_head_sha':os.environ['HEAD_SHA'],
+            'steps':{
+              'dependencies':os.environ['DEPS'],
+              'reconcile_annotation_accounting':os.environ['RECONCILE'],
+              'finalize_stance_labels':os.environ['STANCE'],
+              'adjudicate_stakeholder_attribution':os.environ['STAKEHOLDER'],
+              'run_svm':os.environ['SVM'],
+              'build_report':os.environ['REPORT'],
+            },
+            'files_present':{name:(p/name).exists() for name in [
+              'annotation_pass_summary.json','reconstructed_stance_summary.json',
+              'reconstructed_stakeholder_attribution_summary.json','svm_metrics.json',
+              'POST_FREEZE_ANALYSIS_REPORT.md','post_freeze_analysis_summary.json']},
+          }
+          (p/'final_analysis_workflow_status.json').write_text(json.dumps(status,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+          print(json.dumps(status,indent=2,sort_keys=True))
+          PY
+
+      - name: Publish status and any successful outputs
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          TMP="$RUNNER_TEMP/final-analysis-diag"
+          rm -rf "$TMP" && mkdir -p "$TMP"
+          for f in \
+            final_analysis_workflow_status.json annotation_pass_summary.json annotation_count_reconciliation.json \
+            reconstructed_stance_labels_final.csv reconstructed_stance_unresolved.csv reconstructed_stance_summary.json reconstructed_stance_hashes.json \
+            reconstructed_stakeholder_attribution_final.csv reconstructed_stakeholder_attribution_unresolved.csv reconstructed_stakeholder_attribution_summary.json reconstructed_stakeholder_attribution_hashes.json \
+            svm_oof_predictions.csv svm_metrics.json stakeholder_acceptance_oof.csv corpus_derived_indices.json model_execution_recovery.csv post_freeze_model_hashes.json \
+            POST_FREEZE_ANALYSIS_REPORT.md post_freeze_analysis_summary.json post_freeze_analysis_hashes.json; do
+            if [ -f "data/post_freeze_analysis/$f" ]; then cp "data/post_freeze_analysis/$f" "$TMP/$f"; fi
+          done
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            git fetch origin post-freeze-analysis
+            git reset --hard origin/post-freeze-analysis
+            mkdir -p data/post_freeze_analysis
+            cp "$TMP"/* data/post_freeze_analysis/
+            git add data/post_freeze_analysis/
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'Publish final analysis diagnostic status'
+            if git push origin HEAD:post-freeze-analysis; then exit 0; fi
+            sleep $((attempt*2))
+          done
+          exit 1

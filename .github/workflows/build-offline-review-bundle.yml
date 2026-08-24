@@ -1,0 +1,196 @@
+name: Build SCIPRA offline reviewer bundle
+
+on:
+  push:
+    branches: [post-freeze-analysis]
+    paths:
+      - 'data/post_freeze_analysis/.offline-review-trigger'
+  pull_request:
+    branches: [dataset-reconstruction]
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/build-offline-review-bundle.yml'
+      - 'code/reconcile_post_freeze_annotation_summary.py'
+      - 'code/finalize_post_freeze_annotations.py'
+      - 'code/adjudicate_post_freeze_stakeholders.py'
+      - 'code/run_post_freeze_model_analysis_v2.py'
+      - 'code/build_post_freeze_analysis_report_v2.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scipra-offline-review-bundle-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: post-freeze-analysis
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install final-analysis dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests trafilatura beautifulsoup4 pypdf pymupdf numpy scikit-learn
+
+      - name: Reconcile annotation accounting
+        run: python code/reconcile_post_freeze_annotation_summary.py
+
+      - name: Finalize reconstructed stance labels
+        run: python code/finalize_post_freeze_annotations.py
+
+      - name: Adjudicate low-confidence stakeholder attribution
+        run: python code/adjudicate_post_freeze_stakeholders.py
+
+      - name: Run leakage-safe TF-IDF RBF-SVM analysis
+        run: python code/run_post_freeze_model_analysis_v2.py
+
+      - name: Build final post-freeze audit report
+        run: python code/build_post_freeze_analysis_report_v2.py
+
+      - name: Assert final-analysis invariants
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('data/post_freeze_analysis')
+          expected='cb280e4cb138b2f6bba48b24f0dcd7521c4cb821871846ceb70523a05a7acad5'
+          ann=json.loads((p/'annotation_pass_summary.json').read_text())
+          stance=json.loads((p/'reconstructed_stance_summary.json').read_text())
+          stake=json.loads((p/'reconstructed_stakeholder_attribution_summary.json').read_text())
+          svm=json.loads((p/'svm_metrics.json').read_text())
+          summary=json.loads((p/'post_freeze_analysis_summary.json').read_text())
+          assert ann['frozen_analysis_manifest_sha256']==expected
+          assert stance['frozen_analysis_manifest_sha256']==expected
+          assert stake['frozen_analysis_manifest_sha256']==expected
+          assert svm['frozen_analysis_manifest_sha256']==expected
+          assert ann['frozen_analysis_ready_records']==876
+          assert ann['texts_recovered_for_execution']==873
+          assert ann['labeled_not_in_review_queue'] + ann['labeled_but_in_stakeholder_review_queue'] + ann['unlabeled_recovered_records_in_stance_review_queue'] == 873
+          assert stance['final_model_eligible_labelled_records'] + stance['unresolved_records_excluded_from_model'] == 876
+          assert set(stance['observed_reconstructed_class_counts']) == {'0','1'}
+          assert stake['stance_labelled_records']==stance['final_model_eligible_labelled_records']
+          assert stake['final_stakeholder_resolved_records'] + stake['final_stakeholder_unresolved_excluded_from_group_aggregation'] == stance['final_model_eligible_labelled_records']
+          assert set(stake['final_group_counts']) == {'NGO','community','government','investor','labour'}
+          assert svm['model_evaluable_records_after_fresh_text_recovery'] <= stance['final_model_eligible_labelled_records']
+          assert summary['historical_labels_recovered'] is False
+          assert summary['historical_71_16_used_as_target'] is False
+          print(json.dumps({'annotation':ann,'stance':stance,'stakeholder':stake,'svm':svm,'summary':summary},indent=2))
+          PY
+
+      - name: Build exact offline reviewer bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$PWD"
+          export STAGE="$RUNNER_TEMP/SCIPRA_offline_reviewer_bundle"
+          rm -rf "$STAGE"
+          mkdir -p "$STAGE/01_CORPUS_FREEZE" "$STAGE/02_POST_FREEZE_ANALYSIS" "$STAGE/03_REPRODUCTION_CODE" "$STAGE/04_STATUS_AND_GUIDES"
+
+          cp data/reconstruction/scipra_corpus_freeze_handoff.zip "$STAGE/01_CORPUS_FREEZE/"
+          cp data/reconstruction/review_handoff/canonical_reconstructed_replication_corpus.csv "$STAGE/01_CORPUS_FREEZE/"
+          cp data/reconstruction/review_handoff/canonical_analysis_ready_manifest.csv "$STAGE/01_CORPUS_FREEZE/"
+          cp data/reconstruction/review_handoff/corpus_freeze_summary.json "$STAGE/01_CORPUS_FREEZE/"
+          cp data/reconstruction/review_handoff/corpus_freeze_hashes.json "$STAGE/01_CORPUS_FREEZE/"
+          cp data/reconstruction/review_handoff/README.md "$STAGE/01_CORPUS_FREEZE/CORPUS_REVIEW_README.md"
+          cp data/reconstruction/review_handoff/REVIEWER_CHECKLIST.md "$STAGE/01_CORPUS_FREEZE/"
+          cp data/reconstruction/RECONSTRUCTION_PROTOCOL.md "$STAGE/01_CORPUS_FREEZE/"
+          cp data/reconstruction/MEDIA_SUBSTANTIVE_SCREENING_RUBRIC.md "$STAGE/01_CORPUS_FREEZE/"
+
+          for f in \
+            annotation_pass_summary.json annotation_count_reconciliation.json reconstructed_annotation_draft.csv annotation_review_queue.csv post_freeze_recovery_status.csv \
+            reconstructed_stance_labels_final.csv reconstructed_stance_unresolved.csv reconstructed_stance_summary.json reconstructed_stance_hashes.json \
+            reconstructed_stakeholder_attribution_final.csv reconstructed_stakeholder_attribution_unresolved.csv reconstructed_stakeholder_attribution_summary.json reconstructed_stakeholder_attribution_hashes.json \
+            svm_oof_predictions.csv svm_metrics.json stakeholder_acceptance_oof.csv corpus_derived_indices.json model_execution_recovery.csv post_freeze_model_hashes.json \
+            mcdm_reproducibility_audit.json scenario_formula_validation.csv mathematical_audit_hashes.json \
+            POST_FREEZE_ANALYSIS_REPORT.md post_freeze_analysis_summary.json post_freeze_analysis_hashes.json; do
+            cp "data/post_freeze_analysis/$f" "$STAGE/02_POST_FREEZE_ANALYSIS/"
+          done
+          if [ -f data/post_freeze_analysis/annotation_protocol_excerpt.txt ]; then cp data/post_freeze_analysis/annotation_protocol_excerpt.txt "$STAGE/02_POST_FREEZE_ANALYSIS/"; fi
+
+          for f in \
+            post_freeze_annotation_pass.py reconcile_post_freeze_annotation_summary.py finalize_post_freeze_annotations.py \
+            adjudicate_post_freeze_stakeholders.py run_post_freeze_model_analysis_v2.py audit_post_freeze_mcdm_formulas.py \
+            build_post_freeze_analysis_report_v2.py dynamic_weighting.py pci_computation.py; do
+            if [ -f "code/$f" ]; then cp "code/$f" "$STAGE/03_REPRODUCTION_CODE/"; fi
+          done
+
+          cp data/post_freeze_analysis/REVIEWER_HANDOFF.md "$STAGE/START_HERE.md"
+          cp data/post_freeze_analysis/REVIEWER_HANDOFF.md "$STAGE/04_STATUS_AND_GUIDES/REVIEWER_HANDOFF.md"
+          cp data/post_freeze_analysis/POST_FREEZE_ANALYSIS_REPORT.md "$STAGE/04_STATUS_AND_GUIDES/"
+
+          cat > "$STAGE/04_STATUS_AND_GUIDES/OFFLINE_PACKAGE_NOTE.txt" <<'EOF'
+          This package contains the exact frozen corpus evidence and completed post-freeze reconstructed analysis.
+          Historical N=87 and the historical 71:16 stance split were never used as reconstruction targets.
+          Reconstructed stance labels are computational applications of Appendix B.4.2, not recovered human labels.
+          Unresolved stakeholder attribution is excluded from stakeholder-group aggregation rather than forced.
+          SWDC scalar-normalization degeneracy is preserved as a reproducibility finding and is not patched by assumption.
+          EOF
+
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json, os
+          stage=Path(os.environ['STAGE'])
+          rows=[]
+          for p in sorted(stage.rglob('*')):
+              if p.is_file():
+                  rows.append({'path':str(p.relative_to(stage)),'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size})
+          (stage/'OFFLINE_PACKAGE_SHA256_MANIFEST.json').write_text(json.dumps(rows,indent=2)+'\n',encoding='utf-8')
+          PY
+
+          cd "$RUNNER_TEMP"
+          zip -r -9 SCIPRA_OFFLINE_REVIEWER_BUNDLE.zip SCIPRA_offline_reviewer_bundle >/dev/null
+          mv SCIPRA_OFFLINE_REVIEWER_BUNDLE.zip "$ROOT/SCIPRA_OFFLINE_REVIEWER_BUNDLE.zip"
+
+      - name: Stage publishable outputs
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          TMP="$RUNNER_TEMP/final-post-freeze-publish"
+          rm -rf "$TMP" && mkdir -p "$TMP"
+          for f in \
+            annotation_pass_summary.json annotation_count_reconciliation.json \
+            reconstructed_stance_labels_final.csv reconstructed_stance_unresolved.csv reconstructed_stance_summary.json reconstructed_stance_hashes.json \
+            reconstructed_stakeholder_attribution_final.csv reconstructed_stakeholder_attribution_unresolved.csv reconstructed_stakeholder_attribution_summary.json reconstructed_stakeholder_attribution_hashes.json \
+            svm_oof_predictions.csv svm_metrics.json stakeholder_acceptance_oof.csv corpus_derived_indices.json model_execution_recovery.csv post_freeze_model_hashes.json \
+            POST_FREEZE_ANALYSIS_REPORT.md post_freeze_analysis_summary.json post_freeze_analysis_hashes.json; do
+            cp "data/post_freeze_analysis/$f" "$TMP/$f"
+          done
+
+      - name: Publish final post-freeze outputs
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          TMP="$RUNNER_TEMP/final-post-freeze-publish"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            git fetch origin post-freeze-analysis
+            git reset --hard origin/post-freeze-analysis
+            mkdir -p data/post_freeze_analysis
+            cp "$TMP"/* data/post_freeze_analysis/
+            git add data/post_freeze_analysis/
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'Publish completed post-freeze reconstructed analysis'
+            if git push origin HEAD:post-freeze-analysis; then exit 0; fi
+            sleep $((attempt*3))
+          done
+          exit 1
+
+      - name: Upload offline reviewer bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: SCIPRA_OFFLINE_REVIEWER_BUNDLE
+          path: SCIPRA_OFFLINE_REVIEWER_BUNDLE.zip
+          retention-days: 30
