@@ -1,0 +1,48 @@
+name: Extract SCIPRA post-freeze methodology definitions
+
+on:
+  push:
+    branches: [post-freeze-analysis]
+    paths:
+      - 'code/post_freeze_extract_methodology.py'
+      - '.github/workflows/post-freeze-methodology-extract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scipra-post-freeze-methodology
+  cancel-in-progress: true
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: post-freeze-analysis
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Extract methodology paragraphs
+        run: python code/post_freeze_extract_methodology.py
+      - name: Publish extract
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp data/post_freeze_analysis/methodology_keyword_extract.txt /tmp/methodology_keyword_extract.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            git fetch origin post-freeze-analysis
+            git reset --hard origin/post-freeze-analysis
+            mkdir -p data/post_freeze_analysis
+            cp /tmp/methodology_keyword_extract.txt data/post_freeze_analysis/methodology_keyword_extract.txt
+            git add data/post_freeze_analysis/methodology_keyword_extract.txt
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'Publish post-freeze methodology extract'
+            if git push origin HEAD:post-freeze-analysis; then exit 0; fi
+            sleep $((attempt * 2))
+          done
+          exit 1
