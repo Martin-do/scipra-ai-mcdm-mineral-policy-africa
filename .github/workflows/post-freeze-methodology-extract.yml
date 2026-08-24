@@ -6,6 +6,12 @@ on:
     paths:
       - 'code/post_freeze_extract_methodology.py'
       - '.github/workflows/post-freeze-methodology-extract.yml'
+  pull_request:
+    branches: [dataset-reconstruction]
+    types: [synchronize, opened, reopened]
+    paths:
+      - 'code/post_freeze_extract_methodology.py'
+      - '.github/workflows/post-freeze-methodology-extract.yml'
   workflow_dispatch:
 
 permissions:
@@ -27,7 +33,8 @@ jobs:
           python-version: '3.11'
       - name: Extract methodology paragraphs
         run: python code/post_freeze_extract_methodology.py
-      - name: Publish extract
+      - name: Publish extract on push only
+        if: github.event_name != 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
