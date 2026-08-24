@@ -33,7 +33,7 @@ jobs:
         run: |
           set -euo pipefail
           ROOT="$PWD"
-          STAGE="$RUNNER_TEMP/SCIPRA_offline_reviewer_bundle"
+          export STAGE="$RUNNER_TEMP/SCIPRA_offline_reviewer_bundle"
           rm -rf "$STAGE"
           mkdir -p "$STAGE/01_CORPUS_FREEZE" "$STAGE/02_POST_FREEZE_ANALYSIS" "$STAGE/03_REPRODUCTION_CODE" "$STAGE/04_STATUS_AND_GUIDES"
 
@@ -87,8 +87,8 @@ jobs:
 
           python - <<'PY'
           from pathlib import Path
-          import hashlib, json
-          stage=Path(r'''${STAGE}''')
+          import hashlib, json, os
+          stage=Path(os.environ['STAGE'])
           rows=[]
           for p in sorted(stage.rglob('*')):
               if p.is_file():
