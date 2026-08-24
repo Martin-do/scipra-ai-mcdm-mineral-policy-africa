@@ -1,9 +1,11 @@
 {
+  "computational_readings_agreement_rate_on_recovered_text": 0.8900343642611683,
   "draft_label_counts": {
     "0": 672,
     "1": 63
   },
   "draft_labels_assigned_total": 735,
+  "frozen_analysis_manifest_sha256": "cb280e4cb138b2f6bba48b24f0dcd7521c4cb821871846ceb70523a05a7acad5",
   "frozen_analysis_ready_records": 876,
   "historical_71_16_distribution_used_as_target": false,
   "human_annotation_claim": false,
