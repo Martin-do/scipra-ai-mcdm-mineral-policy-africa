@@ -1,0 +1,26 @@
+{
+  "computational_readings_agreement_rate_on_recovered_text": 0.8900343642611683,
+  "draft_label_counts": {
+    "0": 672,
+    "1": 63
+  },
+  "draft_labels_without_review": 735,
+  "frozen_analysis_manifest_sha256": "cb280e4cb138b2f6bba48b24f0dcd7521c4cb821871846ceb70523a05a7acad5",
+  "frozen_analysis_ready_records": 876,
+  "historical_71_16_distribution_used_as_target": false,
+  "human_annotation_claim": false,
+  "important_limitation": "These are reconstructed computational annotations applying the documented B.4.2 criteria. They do not reproduce the unavailable historical two-human-annotator labels; disagreements and low-confidence cases are deliberately withheld for review before model fitting.",
+  "legacy_svm_labels_used": false,
+  "model_fitting_performed": false,
+  "review_queue_records": 189,
+  "stage": "post_freeze_computational_reannotation_pass_1",
+  "stakeholder_proxy_counts_recovered": {
+    "NGO": 33,
+    "community": 43,
+    "government": 339,
+    "investor": 189,
+    "labour": 269
+  },
+  "texts_recovered_for_execution": 873,
+  "texts_unavailable_at_execution": 3
+}
