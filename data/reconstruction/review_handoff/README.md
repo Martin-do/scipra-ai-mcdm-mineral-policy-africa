@@ -1,83 +1,49 @@
-# SCIPRA reconstructed corpus — external review handoff
+# SCIPRA reconstructed replication corpus — frozen audit handoff
 
-## Status
+This directory is the reviewer-facing audit package for the **frozen reconstructed replication corpus**. It replaces the earlier preliminary handoff that still described archive candidates as pending review.
 
-This is a **pre-model, pre-label, non-frozen reconstruction snapshot**. It must not be described as the final SCIPRA corpus or as the exact historical 87-document corpus.
+## Frozen membership
 
-The manuscript historically reported **N=87**. During reproducibility reconstruction, that number was demoted from a target to a historical benchmark. Corpus membership is now determined prospectively by the documented retrieval and source-family rules.
+- Frozen retained corpus: **886 records**
+- Analysis-ready subset: **876 records**
+- Retained non-analysis-ready quality exceptions: **10 records**
+- Coverage period: **2010-01-01 through 2023-12-31**
+- Historical reported corpus size **N=87**: benchmark only; it was **not** used as a target, quota, class-balancing device, or stopping rule.
 
-## Screened/acquired snapshot
+The canonical membership file is `canonical_reconstructed_replication_corpus.csv`. The modeling-eligible pre-annotation subset is `canonical_analysis_ready_manifest.csv`. Their SHA-256 values are locked in `corpus_freeze_hashes.json`.
 
-- Candidates processed in this screened-only snapshot: **366**
-- Acquisition status: **{"acquired_extracted": 359, "acquired_low_text": 2, "acquired_no_text": 5}**
-- Unique extracted texts after exact SHA-256 deduplication, before manual exclusions: **303**
-- Preliminary screened corpus after exact deduplication and prospective exclusions: **301**
-- Acquisition exceptions: **7**
-- Exact duplicate clusters / redundant records: **54 / 56**
-- Same-title/year clusters still flagged: **7**
-- Same-URL clusters still flagged: **2**
-- Near-duplicate pairs at similarity >= 0.95: **7**
+## Completed review chain
 
-The main row-level dataset for review is `screened_qc_preliminary_unique_text_manifest.csv`. It contains source URLs, metadata, acquisition details and text hashes; it does **not** redistribute full copyrighted news text.
+1. Title-trigger archive media: **690/690 explicitly screened** — 547 included pre-dedup, 143 excluded.
+2. Secondary-keyword archive media: **1,062/1,062 explicitly screened** — 131 included pre-dedup, 931 excluded.
+3. Cross-phase and prior-QC exact/same-source duplicate review completed.
+4. Metadata-driven near-duplicate review completed.
+5. Final textwide TF-IDF audit covered the full analysis-ready pre-freeze set and produced **7 pairs >=0.95**, all explicitly reviewed and collapsed as republication/syndication/update duplicates.
+6. Latest live recovery extracted **879/883** analysis-ready records. The remaining four annual-report/official-PDF extraction gaps were reconciled to previously reviewed extractions with stored SHA-256 values and substantial text lengths.
+7. Membership and the analysis-ready subset were hashed **before stance annotation or model fitting**.
 
-## Archive-discovery queue — not yet corpus members
+## EITI provenance limitation
 
-A reproducible archive/sitemap discovery pass produced **2076** URLs from the documented media publishers that the crawler could enumerate.
+> The reported set of 13 South Africa EITI documents cannot presently be independently recovered or validated as described in the original corpus documentation.
 
-- Direct case-title new candidates: **690** (`archive_direct_case_review_queue.csv`)
-- Secondary-keyword review queue: **1062** (`archive_secondary_keyword_review_queue.csv`)
-- Year-unresolved review queue: **7** (`archive_year_unresolved_review_queue.csv`)
+This is a provenance/documentation limitation. The reconstruction does not convert it into an allegation of fabrication.
 
-These records are deliberately kept separate from the screened corpus. A title-level match is not enough for final inclusion; they require substantive eligibility, acquisition/text-quality and duplicate review.
+## What the freeze does — and does not do
 
-Mining Weekly's historical sitemap coverage was incomplete, so its manually recovered records remain valid and the crawler's zero historical Mining Weekly count must **not** be interpreted as absence of Mining Weekly material.
+The freeze fixes corpus membership and identifies which retained records are presently analysis-ready. It does **not** assert that this is an exact recovery of the historical 87 documents. It also does not reproduce the historical 71/16 stance distribution.
 
-## Major reproducibility findings
+No stance annotation, TF-IDF/SVM classifier fit, MCDM, PCI or RPCI calculation was used to select or balance the frozen corpus. Those are downstream analysis stages and must consume this frozen version without changing membership.
 
-1. The original supplementary description of **13 EITI South Africa documents is not recoverable as described**; South Africa is not an EITI implementing country. The reconstructed corpus therefore must be disclosed as a reconstructed replication corpus, not represented as the exact original 87 documents.
-2. `Policy Gap 10` is about Kumba Iron Ore/Sishen and was prospectively excluded as outside the declared Marikana/Lonmin scope. `Policy Gap 7` is the directly Lonmin-focused Bench Marks follow-up and is represented in the reconstruction pool.
-3. Repeated retrieval showed that stopping at 87 would artificially truncate the recoverable source universe. Final N must be an outcome of the retrieval protocol.
-4. No historical class target (including the manuscript's reported 71/16 distribution), SVM metric, stance label or downstream model result was used to select documents.
+## Files to review first
 
-## Source-family status
+- `HANDOFF_SUMMARY.json` — compact reviewer summary.
+- `corpus_freeze_summary.json` — machine-readable freeze assertions.
+- `corpus_freeze_hashes.json` — SHA-256 lock file.
+- `canonical_reconstructed_replication_corpus.csv` — frozen membership, N=886.
+- `canonical_analysis_ready_manifest.csv` — pre-annotation analysis-ready subset, N=876.
+- `retained_quality_exceptions.csv` — the 10 retained records not currently analysis-ready.
+- `textwide_near_duplicate_final_decisions.csv` — final seven textwide duplicate decisions.
+- `textwide_recovery_reconciliation.csv` — four current extraction gaps reconciled to earlier validated text.
+- `media_substantive_decision_summary.json` and `secondary_media_substantive_decision_summary.json` — completed media-screening ledgers.
 
-See `source_family_status.csv` for the formal closure table. At this snapshot:
-
-- Marikana Commission / Justice: retrieval saturated under the fixed genre rules.
-- Government / Parliament / regulator: retrieval saturated under the fixed case-centrality rules.
-- NGO/civil society: source discovery saturated; newly resolved SERI/CER documents are included in this screened acquisition snapshot and remain subject to acquisition/QC outcomes.
-- Corporate Lonmin/Sibanye-Stillwater: source discovery saturated; final release URLs are resolved, while protected report-host files remain transparent acquisition exceptions where applicable.
-- Media: archive discovery completed for enumerable Daily Maverick/Engineering News endpoints; substantive screening of the newly discovered queues remains outstanding. Mining Weekly requires the preserved manual search pathway because its historical sitemap is incomplete.
-
-## What has NOT been done
-
-- Corpus is **not frozen**.
-- No stance labels have been assigned for the reconstructed corpus.
-- No class distribution has been accepted or targeted.
-- No TF-IDF/SVM model has been rerun on this reconstruction.
-- No manuscript metrics have been used as acceptance criteria.
-
-## Recommended reviewer questions
-
-1. Are the predeclared source-family rules sufficiently precise and defensible?
-2. Should Commission Heads of Argument and expert analytical papers be retained in the same NLP corpus as media/corporate documents, or analysed as a stratified source family?
-3. Are broader governance reports such as CER documents sufficiently Marikana/Lonmin-centred for the strict corpus?
-4. Is the exact/near-duplicate strategy adequate for Creamer Media mirrors and republications?
-5. Should the 690 direct-case archive candidates all undergo full-text substantive screening, or should a narrower prospective title/document-type rule be specified before that screening?
-6. Should source-family proportions be reported/stratified rather than attempting to reproduce the historical 58/11/etc. quotas?
-7. Is the term **reconstructed replication corpus** appropriate given that the claimed EITI block cannot be recovered as originally described?
-
-## Key files
-
-- `screened_qc_preliminary_unique_text_manifest.csv` — current preliminary unique screened corpus manifest.
-- `screened_acquisition_status.csv` — every screened candidate's acquisition/extraction result, hashes and source URL.
-- `screened_qc_acquisition_exceptions.csv` — acquisition/text exceptions.
-- `screened_qc_exact_duplicate_clusters.csv` — exact duplicate provenance.
-- `screened_qc_near_duplicate_review.csv` — high-similarity cases requiring review.
-- `archive_direct_case_review_queue.csv` — newly discovered direct Marikana/Lonmin/etc. URL candidates, not yet corpus members.
-- `archive_secondary_keyword_review_queue.csv` — ambiguous archive matches preserved for review.
-- `RECONSTRUCTION_PROTOCOL.md`, `SOURCE_FAMILY_RULES.md`, `retrieval_search_log.csv`, `source_family_status.csv` — methodology and retrieval audit trail.
-
-## Reproducibility boundary
-
-This handoff contains manifests, URLs, hashes, acquisition/QC records and protocol material. Full copyrighted news article text is not redistributed in this review folder. The repository acquisition workflow records how source material was retrieved/extracted so an authorised reviewer can reproduce the acquisition from the original public URLs.
+Full copyrighted media article text is intentionally not redistributed in this handoff.

@@ -1,17 +1,11 @@
-# External reviewer checklist
+# Reviewer checklist
 
-Please review before any corpus freeze or model rerun:
-
-- [ ] Historical N=87 is treated only as a benchmark, not a stopping rule.
-- [ ] EITI South Africa provenance problem and reconstruction disclosure are acceptable.
-- [ ] Date window and Marikana/Lonmin case-centrality rules are appropriate.
-- [ ] Source-family genre rules are appropriate.
-- [ ] Commission submissions/expert papers are comparable enough to retain, or should be stratified.
-- [ ] Government/NGO/corporate source-family closure decisions are defensible.
-- [ ] Archive direct-case review queue should be substantively screened under the current rules.
-- [ ] Secondary-keyword archive queue handling is sufficiently conservative.
-- [ ] Mining Weekly incomplete sitemap limitation is documented adequately.
-- [ ] Exact duplicate and near-duplicate rules are adequate.
-- [ ] Prospective manual exclusions are justified without reference to model results.
-- [ ] Final corpus must be frozen and hashed before stance annotation/model fitting.
-- [ ] Observed class distribution must be reported after annotation, not engineered to historical 71/16.
+- [ ] Confirm `corpus_freeze_hashes.json` matches the two canonical CSV files.
+- [ ] Confirm corpus membership is N=886 and analysis-ready membership is N=876.
+- [ ] Confirm the 10 quality exceptions are retained but excluded from the analysis-ready subset.
+- [ ] Inspect the seven final textwide duplicate/republication decisions.
+- [ ] Inspect the four recovery reconciliations and their prior validated SHA-256 values.
+- [ ] Confirm title-trigger screening is 690/690 complete and secondary screening is 1,062/1,062 complete.
+- [ ] Confirm historical N=87 is described only as a benchmark, not a reconstruction target.
+- [ ] Confirm the EITI limitation is phrased as an unrecovered/unvalidated provenance claim, not as fabrication.
+- [ ] Confirm no stance labels, SVM output, PCI/RPCI or MCDM result influenced membership.
