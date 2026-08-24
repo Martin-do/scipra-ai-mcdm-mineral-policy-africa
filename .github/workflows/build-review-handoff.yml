@@ -1,4 +1,4 @@
-name: Build SCIPRA external review handoff
+name: Build SCIPRA frozen corpus audit handoff
 
 on:
   push:
@@ -6,11 +6,21 @@ on:
       - dataset-reconstruction
     paths:
       - '.github/workflows/build-review-handoff.yml'
-      - 'data/reconstruction/build_review_handoff.py'
+      - 'data/reconstruction/build_frozen_review_handoff.py'
+      - 'data/reconstruction/corpus_freeze_summary.json'
+      - 'data/reconstruction/corpus_freeze_hashes.json'
+      - 'data/reconstruction/canonical_reconstructed_replication_corpus.csv'
+      - 'data/reconstruction/canonical_analysis_ready_manifest.csv'
+  pull_request:
+    branches: [main]
+    types: [synchronize, reopened]
+    paths:
+      - '.github/workflows/build-review-handoff.yml'
+      - 'data/reconstruction/build_frozen_review_handoff.py'
   workflow_dispatch:
 
 concurrency:
-  group: scipra-review-handoff
+  group: scipra-frozen-review-handoff-${{ github.event_name }}
   cancel-in-progress: true
 
 permissions:
@@ -19,7 +29,6 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
     steps:
       - name: Checkout dataset branch
         uses: actions/checkout@v4
@@ -31,85 +40,51 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install acquisition and QC dependencies
+      - name: Build frozen reviewer handoff and ZIP
+        run: python data/reconstruction/build_frozen_review_handoff.py
+
+      - name: Show handoff summary
+        run: cat data/reconstruction/review_handoff/HANDOFF_SUMMARY.json
+
+      - name: Publish frozen audit handoff safely
+        if: github.event_name != 'pull_request'
+        shell: bash
         run: |
-          sudo apt-get update
-          sudo apt-get install -y tesseract-ocr zip
-          python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 pypdf trafilatura cryptography pymupdf pytesseract pillow scikit-learn==1.4.2
+          set -euo pipefail
+          OUTDIR="/tmp/scipra-handoff-output"
+          rm -rf "$OUTDIR"
+          mkdir -p "$OUTDIR"
+          cp -a data/reconstruction/review_handoff "$OUTDIR/review_handoff"
+          cp data/reconstruction/scipra_corpus_freeze_handoff.zip "$OUTDIR/"
 
-      - name: Run screened-only acquisition snapshot
-        env:
-          SCIPRA_EXCLUDE_DISCOVERY_DIRECT: '1'
-        run: python data/reconstruction/acquire_corpus_v4.py
-
-      - name: Run screened-only corpus QC
-        run: python data/reconstruction/qc_corpus.py
-
-      - name: Build reviewer handoff directory
-        run: python data/reconstruction/build_review_handoff.py
-
-      - name: Add latest full acquisition audit and reviewer note
-        run: |
-          mkdir -p data/reconstruction/review_handoff/latest_full_acquisition_audit
-          cp data/reconstruction/acquisition_summary_latest.json data/reconstruction/review_handoff/latest_full_acquisition_audit/ 2>/dev/null || true
-          cp data/reconstruction/acquisition_status_latest.csv data/reconstruction/review_handoff/latest_full_acquisition_audit/ 2>/dev/null || true
-          if [ -d data/reconstruction/qc ]; then
-            rm -rf data/reconstruction/review_handoff/latest_full_acquisition_audit/qc
-            cp -r data/reconstruction/qc data/reconstruction/review_handoff/latest_full_acquisition_audit/qc
-          fi
-          python - <<'PY'
-          import json
-          from pathlib import Path
-
-          base = Path('data/reconstruction')
-          latest = base / 'acquisition_summary_latest.json'
-          data = json.loads(latest.read_text(encoding='utf-8')) if latest.exists() else {}
-          status = data.get('status_counts', {})
-          note = f'''# Latest full acquisition audit — read before review
-
-This subfolder is deliberately separate from the screened external-review corpus snapshot.
-
-The screened handoff in the parent folder is the current preliminary corpus for substantive review. The files here record the later, broader acquisition pass, which includes archive-discovered candidates that have not all been accepted as corpus members.
-
-Latest recorded acquisition audit:
-
-- Historical seed benchmark: **{data.get('historical_seed_benchmark', 87)}**
-- Eligible expansion candidates encountered: **{data.get('eligible_expansion_candidates', 'n/a')}**
-- Candidates processed: **{data.get('processed_candidates', 'n/a')}**
-- Successfully acquired/extracted: **{status.get('acquired_extracted', 'n/a')}**
-- Acquired with low text: **{status.get('acquired_low_text', 'n/a')}**
-- Acquired with no text: **{status.get('acquired_no_text', 'n/a')}**
-- Failed acquisitions: **{status.get('failed', 'n/a')}**
-- Total extracted words: **{data.get('total_text_words', 'n/a')}**
-
-**Important:** these counts are acquisition/QC counts, not a final corpus size. Do not treat all processed or extracted candidates as included documents. Corpus freeze still requires substantive eligibility review, duplicate resolution, acquisition/text-quality checks, final inclusion/exclusion decisions, and a versioned/hash-locked manifest before annotation or modelling.
-'''
-          (base / 'review_handoff' / 'latest_full_acquisition_audit' / 'README.md').write_text(note, encoding='utf-8')
-          PY
-
-      - name: Build downloadable ZIP
-        run: |
-          rm -f data/reconstruction/scipra_external_review_handoff.zip
-          cd data/reconstruction
-          zip -qr scipra_external_review_handoff.zip review_handoff
-
-      - name: Publish reviewer handoff to branch
-        run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/reconstruction/review_handoff data/reconstruction/scipra_external_review_handoff.zip
-          if ! git diff --cached --quiet; then
-            git commit -m 'Publish screened corpus external review handoff ZIP'
-            git pull --rebase origin dataset-reconstruction
-            git push origin HEAD:dataset-reconstruction
-          fi
 
-      - name: Upload metadata review artifact
+          for attempt in 1 2 3 4; do
+            git fetch origin dataset-reconstruction
+            git reset --hard origin/dataset-reconstruction
+            rm -rf data/reconstruction/review_handoff
+            cp -a "$OUTDIR/review_handoff" data/reconstruction/review_handoff
+            cp "$OUTDIR/scipra_corpus_freeze_handoff.zip" data/reconstruction/scipra_corpus_freeze_handoff.zip
+            rm -f data/reconstruction/scipra_external_review_handoff.zip
+            git add -A data/reconstruction/review_handoff data/reconstruction/scipra_corpus_freeze_handoff.zip data/reconstruction/scipra_external_review_handoff.zip
+            if git diff --cached --quiet; then
+              echo "Frozen handoff already published."
+              exit 0
+            fi
+            git commit -m 'Publish SCIPRA frozen corpus audit handoff'
+            if git push origin HEAD:dataset-reconstruction; then
+              exit 0
+            fi
+            sleep $((attempt * 2))
+          done
+          exit 1
+
+      - name: Upload frozen handoff artifact
         uses: actions/upload-artifact@v4
         with:
-          name: scipra-external-review-handoff
+          name: scipra-frozen-corpus-audit-handoff
           path: |
             data/reconstruction/review_handoff/
-            data/reconstruction/scipra_external_review_handoff.zip
+            data/reconstruction/scipra_corpus_freeze_handoff.zip
           retention-days: 30
