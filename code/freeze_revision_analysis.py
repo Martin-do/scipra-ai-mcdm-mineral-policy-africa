@@ -23,8 +23,8 @@ REQUIRED = [
     "criterion_relevance_summary.json",
     "criterion_relevance_matrix.csv",
     "criterion_relevance_document_audit.csv",
-    "criterion_relevance_weight_sensitivity.csv",
-    "revision_component_ablation_summary.json",
+    "criterion_relevance_matrix_sensitivity.csv",
+    "revision_component_ablation.json",
     "criterion_semantic_sensitivity_summary.json",
     "criterion_semantic_sensitivity_matrix.csv",
     "criterion_semantic_sensitivity_document_audit.csv",
@@ -102,7 +102,7 @@ def main() -> None:
         json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
 
-    readme = f"""# SCIPRA Revision Analysis — Frozen Handoff\n\nThis folder is the frozen downstream revision layer. It does **not** alter the frozen reconstructed corpus or historical-replication outputs.\n\n## Empirical robustness\n\n- Frozen analysis-ready corpus: **876**\n- Final reconstructed labels: **730 resistant / 77 pro-integration / 69 unresolved**\n- Historical reported stance: **71 pro-integration / 16 resistant**\n- The historical split was never used as a selection or annotation target.\n- Across the adjudication sensitivity grid, the resistant-dominant result remains intact.\n\n## Mathematical finding\n\nThe historical scalar-SIC SWDC implementation is structurally degenerate after normalization. The proposed revision introduces explicit stakeholder-by-criterion relevance before normalization and is kept clearly separate from historical replication.\n\n## Evidence-derived revision\n\nThe primary criterion-relevance analysis recovered **{rel['freshly_recovered_records']}/776** resolved-stakeholder records. Its matrix estimates documentary issue prevalence, not expert preference strength.\n\n## Semantic sensitivity\n\nThe post-hoc semantic audit recovered **{sem['fresh_recovered_total']}** records. It tests stricter employment semantics and broader financial semantics and is sensitivity-only; it does not replace the preregistered primary specification.\n\n## Integrity\n\nSee `revision_freeze_hashes.json` for SHA-256 hashes of the required frozen revision files.\n"""
+    readme = f"""# SCIPRA Revision Analysis — Frozen Handoff\n\nThis folder is the frozen downstream revision layer. It does **not** alter the frozen reconstructed corpus or historical-replication outputs.\n\n## Empirical robustness\n\n- Frozen analysis-ready corpus: **876**\n- Final reconstructed labels: **730 resistant / 77 pro-integration / 69 unresolved**\n- Historical reported stance: **71 pro-integration / 16 resistant**\n- The historical split was never used as a selection or annotation target.\n- Across the adjudication sensitivity grid, the resistant-dominant result remains intact.\n\n## Mathematical finding\n\nThe historical scalar-SIC SWDC implementation is structurally degenerate after normalization. The proposed revision introduces explicit stakeholder-by-criterion relevance before normalization and is kept clearly separate from historical replication.\n\n## Evidence-derived revision\n\nThe primary criterion-relevance analysis recovered **{rel['freshly_recovered_records']}/776** resolved-stakeholder records. Its matrix estimates documentary issue prevalence, not expert preference strength.\n\n## Semantic sensitivity\n\nThe post-hoc semantic audit recovered **{sem['fresh_recovered_total']}** records. It tests stricter employment semantics and broader financial semantics and is sensitivity-only; it does not replace the preregistered primary specification. The strong primary Local Employment upweighting is not semantically robust, while Community Infrastructure remains upweighted in the tested variants.\n\n## Integrity\n\nSee `revision_freeze_hashes.json` for SHA-256 hashes of the required frozen revision files.\n"""
     (OUT / "REVISION_FREEZE_README.md").write_text(readme, encoding="utf-8")
     print(json.dumps(summary, indent=2, sort_keys=True))
 
