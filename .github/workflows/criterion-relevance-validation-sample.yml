@@ -1,0 +1,48 @@
+name: Build criterion-relevance validation sample
+
+on:
+  push:
+    branches:
+      - criterion-relevance-validation
+    paths:
+      - "code/build_criterion_relevance_validation_sample.py"
+      - "data/revision_analysis/criterion_relevance_document_audit.csv"
+      - "data/post_freeze_analysis/reconstructed_stakeholder_attribution_final.csv"
+      - ".github/workflows/criterion-relevance-validation-sample.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-sample:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout validation branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build deterministic blinded sample
+        run: python code/build_criterion_relevance_validation_sample.py
+
+      - name: Record hashes
+        run: |
+          cd data/revision_validation
+          sha256sum criterion_relevance_validation_sample_blinded.csv criterion_relevance_validation_key.csv criterion_relevance_validation_sample_summary.json > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Upload validation sample package
+        uses: actions/upload-artifact@v4
+        with:
+          name: SCIPRA_CRITERION_RELEVANCE_VALIDATION_SAMPLE
+          path: |
+            data/revision_validation/criterion_relevance_validation_sample_blinded.csv
+            data/revision_validation/criterion_relevance_validation_key.csv
+            data/revision_validation/criterion_relevance_validation_sample_summary.json
+            data/revision_validation/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
